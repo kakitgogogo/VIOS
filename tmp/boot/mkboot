@@ -1,0 +1,30 @@
+#!/bin/bash
+
+nasm boot.asm -o boot.bin
+nasm loader1.asm -o loader.bin
+#nasm kernel.asm -o kernel.bin
+nasm -f elf kernel.asm -o kernel.o
+ld -s -Ttext 0x30400 kernel.o -o kernel.bin -m elf_i386
+
+#dd if=/dev/zero of=floppy.img bs=512 count=2880
+#dd if=boot.bin of=boot.img bs=512 count=1 conv=notrunc
+#dd if=floppy.img of=boot.img bs=512 count=2879 skip=1 seek=1
+
+#sudo losetup /dev/loop1 boot.img
+#sudo losetup -d /dev/loop0
+#sudo mkdosfs -F 12 /dev/loop1
+#sudo mount /dev/loop1 /mnt/floppy -t msdos -o "fat=12"
+
+#sudo cp loader.bin /tmp
+#sudo umount /tmp
+
+dd if=boot.bin of=boot.img bs=512 count=1 conv=notrunc
+sudo mount -o loop boot.img /mnt/floppy1
+sudo cp loader.bin /mnt/floppy1/ -v
+#sudo cp kernel.bin /mnt/floppy1/ -v
+#sudo umount /mnt/floppy1
+#sudo rm /mnt/floppy1/kernel.bin
+
+xxd -u -a -g 1 -c 16 -s +0x2600 -l 512 boot.img
+
+
