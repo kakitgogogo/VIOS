@@ -1,7 +1,7 @@
 #ifndef	VIOS_GLOBAL_H
 #define	VIOS_GLOBAL_H
 
-#ifndef	GLOBAL_VARIABLE_HERE
+#ifdef	GLOBAL_VARIABLE_HERE
 #undef	EXTERN
 #define	EXTERN
 #endif
