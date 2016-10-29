@@ -22,5 +22,6 @@ PUBLIC void restart();
 
 /*	 main.c 		*/
 PUBLIC void testA();
+PUBLIC void testB();
 
 #endif

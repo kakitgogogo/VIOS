@@ -25,7 +25,8 @@ VIOSBOOT		=	boot/boot.bin boot/loader.bin
 VIOSKERNEL		=	kernel.bin
 OBJS			=	kernel/kernel.o kernel/start.o kernel/i8259.o \
 					kernel/global.o kernel/protect.o lib/klib.o \
-					lib/kliba.o lib/string.o kernel/main.o
+					lib/kliba.o lib/string.o kernel/main.o \
+					kernel/clock.o
 DASMOUTPUT		=	kernel.bin.asm
 
 # image
@@ -79,6 +80,9 @@ kernel/start.o:	kernel/start.c include/type.h include/const.h \
 kernel/main.o: 	kernel/main.c include/type.h include/const.h \
 				include/protect.h include/proto.h include/string.h \
 				include/proc.h
+		$(CC) $(CFLAGS) -o $@ $<
+
+kernel/clock.o:	kernel/clock.c
 		$(CC) $(CFLAGS) -o $@ $<
 
 kernel/i8259.o: 	kernel/i8259.c include/type.h include/const.h \

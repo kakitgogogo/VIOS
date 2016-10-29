@@ -1,16 +1,24 @@
 %include "sconst.inc"
 
+; extern function
 extern	cstart
 extern	kernel_main
 extern	exception_handler
 extern	spurious_irq
+extern	disp_str
+extern	delay
+extern	clock_handler
 
+; extern global variable
 extern	gdt_ptr
 extern	idt_ptr
 extern	proc_ready
 extern	tss
 extern	disp_pos
+extern	k_reenter
 
+[SECTION .data]
+clock_int_msg	db		"-",0
 
 [SECTION .bss]
 StackSpace		resb	2 * 1024
@@ -106,7 +114,55 @@ csinit:
 ; set up hardware interrupt handler
 ;-------------------------------------------------------------------------------------
 ALIGN   16
-hwint00:		iretd
+hwint00:	
+	sub		esp, 4
+	pushad
+	push	ds
+	push	es
+	push	fs
+	push	gs
+
+
+	mov	byte [gs: 158], 1
+	inc	byte [gs: 159]
+
+	mov		al, EOI
+	out		INT_M_CTL, al
+
+	inc	dword [k_reenter]
+	cmp	dword [k_reenter], 0
+	jne		.re_enter
+
+	mov		esp, StackTop
+
+	sti
+
+	push	0
+	call	clock_handler
+	add		esp, 4
+
+	push	1000
+	call	delay
+	add		esp, 4
+
+	cli
+
+	mov		esp, [proc_ready]
+	lldt	[esp + P_LDT_SELECTOR]
+	lea		eax, [esp + P_STACKTOP]
+	mov	dword [tss + TSS3_S_SP0], eax
+
+.re_enter:
+	dec	dword [k_reenter]
+	pop		gs
+	pop		fs
+	pop		es
+	pop		ds
+	popad
+	add		esp, 4
+
+	iretd
+
 ALIGN   16
 hwint01:		hwint_master		1
 ALIGN   16

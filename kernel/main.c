@@ -10,28 +10,47 @@ PUBLIC int kernel_main()
 {
 	disp_str("Test Process...\n");
 
-	PROCESS* proc = &proc_table[0];
+	PROCESS* proc = proc_table;
+	TASK* task = task_table;
+	char* stack_top = task_stack + STACK_SIZE_TOTAL;
+	u16 selector_ldt = SELECTOR_LDT_FIRST;	
 
-	proc->ldt_selector = SELECTOR_LDT_FIRST;
+	int i;
+	for(i = 0; i < NR_TASKS; ++i)
+	{
+		//strcpy(proc->pname, task->name);
 
-	memcpy(&proc->ldts[0], &gdt[SELECTOR_KERNEL_CS>>3],sizeof(DESCRIPTOR));
-	proc->ldts[0].attr1 = DA_C | PRIVILEGE_TASK << 5;
+		proc->pid = i;
 
-	memcpy(&proc->ldts[1], &gdt[SELECTOR_KERNEL_DS>>3],sizeof(DESCRIPTOR));
-	proc->ldts[1].attr1 = DA_DRW | PRIVILEGE_TASK << 5;
+		proc->ldt_selector = selector_ldt;
 
-	proc->regs.cs = (SELECTOR_IN_LDT(0) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | RPL_TASK;
-	proc->regs.ds = (SELECTOR_IN_LDT(1) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | RPL_TASK;
-	proc->regs.es = (SELECTOR_IN_LDT(1) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | RPL_TASK;
-	proc->regs.fs = (SELECTOR_IN_LDT(1) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | RPL_TASK;
-	proc->regs.ss = (SELECTOR_IN_LDT(1) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | RPL_TASK;
-	proc->regs.gs = (SELECTOR_KERNEL_GS & SA_RPL_MASK & SA_TI_MASK) | SA_TIG | RPL_TASK;
+		memcpy(&proc->ldts[0], &gdt[SELECTOR_KERNEL_CS>>3],sizeof(DESCRIPTOR));
+		proc->ldts[0].attr1 = DA_C | PRIVILEGE_TASK << 5;
 
-	proc->regs.eip = (u32)testA;
-	proc->regs.esp = (u32)(task_stack + STACK_SIZE_TOTAL);
-	proc->regs.eflags = 0x1202;
+		memcpy(&proc->ldts[1], &gdt[SELECTOR_KERNEL_DS>>3],sizeof(DESCRIPTOR));
+		proc->ldts[1].attr1 = DA_DRW | PRIVILEGE_TASK << 5;
 
-	proc_ready = &proc_table[0];
+		proc->regs.cs = (SELECTOR_IN_LDT(0) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | RPL_TASK;
+		proc->regs.ds = (SELECTOR_IN_LDT(1) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | RPL_TASK;
+		proc->regs.es = (SELECTOR_IN_LDT(1) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | RPL_TASK;
+		proc->regs.fs = (SELECTOR_IN_LDT(1) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | RPL_TASK;
+		proc->regs.ss = (SELECTOR_IN_LDT(1) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | RPL_TASK;
+		proc->regs.gs = (SELECTOR_KERNEL_GS & SA_RPL_MASK & SA_TI_MASK) | SA_TIG | RPL_TASK;
+
+		proc->regs.eip = (u32)task->initial_eip;
+		proc->regs.esp = (u32)(stack_top);
+		proc->regs.eflags = 0x1202;
+
+		stack_top -= task->stacksize;
+		++proc;
+		++task;
+		selector_ldt += 1<<3;
+	}
+	
+
+	k_reenter = -1;
+
+	proc_ready = proc_table;
 
 	restart();
 
@@ -46,6 +65,18 @@ void testA()
 		disp_str("A");
 		disp_int(i++);
 		disp_str(" ");
-		delay(1);
+		delay(1000);
+	}
+}
+
+void testB()
+{
+	int i = 0;
+	while(1)
+	{
+		disp_str("B");
+		disp_int(i++);
+		disp_str(" ");
+		delay(1000);
 	}
 }

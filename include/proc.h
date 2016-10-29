@@ -7,6 +7,7 @@ typedef struct s_stackframe
 	u32	fs;
 	u32	es;
 	u32	ds;
+
 	u32	edi;
 	u32	esi;
 	u32	ebp;
@@ -15,7 +16,9 @@ typedef struct s_stackframe
 	u32	edx;
 	u32	ecx;
 	u32	eax;
+
 	u32	retaddr;
+
 	u32	eip;
 	u32	cs;
 	u32	eflags;
@@ -29,12 +32,20 @@ typedef struct s_proc
 	u16			ldt_selector;
 	DESCRIPTOR	ldts[LDT_SIZE];
 	u32			pid;
-	char		p_name[16];
+	char		pname[16];
 }PROCESS;
 
-#define	NR_TASKS		1
+typedef struct s_task
+{
+	task_f		initial_eip;
+	int			stacksize;
+	char		name[32];
+}TASK;
+
+#define	NR_TASKS		2
 
 #define	STACK_SIZE_TESTA		0x8000
-#define	STACK_SIZE_TOTAL		STACK_SIZE_TESTA
+#define	STACK_SIZE_TESTB		0x8000
+#define	STACK_SIZE_TOTAL		(STACK_SIZE_TESTA + STACK_SIZE_TESTB)
 
 #endif

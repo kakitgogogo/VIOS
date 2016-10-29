@@ -58,13 +58,13 @@ start:
 
 	jc		.fail
 	add		di, 20
-	inc		dword [MCRNumber16]
+	inc	dword [MCRNumber16]
 
 	cmp		ebx, 0
 	jne		.loop
 	jmp		.end
 .fail:
-	mov		dword [MCRNumber16], 0
+	mov	dword [MCRNumber16], 0
 .end:
 
 ; find kernel.bin
@@ -452,10 +452,10 @@ displayMemInfo:
 	call	displayInt	
 	add		esp, 4	
 
-	pop ebx
-	pop	ecx
-	pop	edi
-	pop	esi
+	pop		ebx
+	pop		ecx
+	pop		edi
+	pop		esi
 	ret
 ;-------------------------------------------------------------------------------------
 

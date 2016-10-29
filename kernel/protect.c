@@ -121,16 +121,24 @@ PUBLIC void init_prot()
 
 	memset(&tss, 0, sizeof(tss));
 	tss.ss0 = SELECTOR_KERNEL_DS;
-	init_descriptor(	&gdt[INDEX_TSS], 
-					vir2phys(seg2phys(SELECTOR_KERNEL_DS), &tss),
-					sizeof(tss) - 1,
-					DA_386TSS);
+	init_descriptor(	
+		&gdt[INDEX_TSS], 
+		vir2phys(seg2phys(SELECTOR_KERNEL_DS), &tss),
+		sizeof(tss) - 1,
+		DA_386TSS);
 	tss.iobase = sizeof(tss);
 
-	init_descriptor(	&gdt[INDEX_LDT_FIRST], 
-					vir2phys(seg2phys(SELECTOR_KERNEL_DS), proc_table[0].ldts),
-					LDT_SIZE * sizeof(DESCRIPTOR) - 1,
-					DA_LDT);
+	int i;
+	u16 index_ldt = INDEX_LDT_FIRST;
+	for(i = 0; i < NR_TASKS; ++i)
+	{
+		init_descriptor(	
+			&gdt[index_ldt], 
+			vir2phys(seg2phys(SELECTOR_KERNEL_DS), proc_table[i].ldts),
+			LDT_SIZE * sizeof(DESCRIPTOR) - 1,
+			DA_LDT);
+		++index_ldt;
+	}	
 }
 
 PUBLIC void exception_handler(int vec_no, int err_code, int eip, int cs, int eflags)
@@ -161,9 +169,9 @@ PUBLIC void exception_handler(int vec_no, int err_code, int eip, int cs, int efl
 					};
 
 	disp_pos = 0;
-	for(i = 0; i < 80*5; ++i)
+	for(i = 0; i < 80*3; ++i)
 	{
-		disp_str(" ");
+		disp_color_str(" ", text_color);
 	}
 	disp_pos = 0;
 
@@ -171,15 +179,15 @@ PUBLIC void exception_handler(int vec_no, int err_code, int eip, int cs, int efl
 	disp_color_str(err_msg[vec_no], text_color);
 	disp_color_str("\n\n", text_color);
 	disp_color_str("EFLAGS:", text_color);
-	disp_int(eflags);
+	disp_color_int(eflags, text_color);
 	disp_color_str(" CS:", text_color);
-	disp_int(cs);
+	disp_color_int(cs, text_color);
 	disp_color_str(" EIP:", text_color);
-	disp_int(eip);
+	disp_color_int(eip, text_color);
 
 	if(err_code != 0xFFFFFFFF)
 	{
 		disp_color_str(" Error code:", text_color);
-		disp_int(err_code);
+		disp_color_int(err_code, text_color);
 	}
 }
