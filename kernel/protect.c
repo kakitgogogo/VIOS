@@ -1,6 +1,7 @@
 #include "type.h"
 #include "const.h"
 #include "protect.h"
+#include "proc.h"
 #include "global.h"
 #include "proto.h"
 
@@ -37,6 +38,21 @@ void	hwint13();
 void	hwint14();
 void	hwint15();
 
+PUBLIC u32 seg2phys(u16 selector)
+{
+	DESCRIPTOR* item = &gdt[selector>>3];
+	return (item->base_high<<24 | item->base_mid<<16 | item->base_low);
+}
+
+PRIVATE void init_descriptor(DESCRIPTOR *desc, u32 base, u32 limit, u16 attribute)
+{
+	desc->limit_low		= limit & 0xFFFF;
+	desc->base_low		= base & 0xFFFF;
+	desc->base_mid		= (base >> 16) & 0x0FF;
+	desc->attr1			= attribute & 0xFF;
+	desc->limit_high_attr2	= ((limit>>16) & 0x0F) | (attribute>>8) & 0xF0;
+	desc->base_high		= (base >> 24) & 0x0FF;
+}
 
 PRIVATE void init_idt_desc(u8 vector, u8 desc_type, int_handler handler, u8 privilege)
 {
@@ -102,12 +118,25 @@ PUBLIC void init_prot()
 	init_idt_desc(INT_VECTOR_IRQ8 + 5, DA_386IGate, hwint13, PRIVILEGE_KRNL);
 	init_idt_desc(INT_VECTOR_IRQ8 + 6, DA_386IGate, hwint14, PRIVILEGE_KRNL);
 	init_idt_desc(INT_VECTOR_IRQ8 + 7, DA_386IGate, hwint15, PRIVILEGE_KRNL);
+
+	memset(&tss, 0, sizeof(tss));
+	tss.ss0 = SELECTOR_KERNEL_DS;
+	init_descriptor(	&gdt[INDEX_TSS], 
+					vir2phys(seg2phys(SELECTOR_KERNEL_DS), &tss),
+					sizeof(tss) - 1,
+					DA_386TSS);
+	tss.iobase = sizeof(tss);
+
+	init_descriptor(	&gdt[INDEX_LDT_FIRST], 
+					vir2phys(seg2phys(SELECTOR_KERNEL_DS), proc_table[0].ldts),
+					LDT_SIZE * sizeof(DESCRIPTOR) - 1,
+					DA_LDT);
 }
 
 PUBLIC void exception_handler(int vec_no, int err_code, int eip, int cs, int eflags)
 {
 	int i;
-	int text_color = 0x04;
+	int text_color = 0xF4;
 
 	char * err_msg[] =	{"#DE Divide Error",
 					"#DB RESERVED",
@@ -143,14 +172,14 @@ PUBLIC void exception_handler(int vec_no, int err_code, int eip, int cs, int efl
 	disp_color_str("\n\n", text_color);
 	disp_color_str("EFLAGS:", text_color);
 	disp_int(eflags);
-	disp_color_str("CS:", text_color);
+	disp_color_str(" CS:", text_color);
 	disp_int(cs);
-	disp_color_str("EIP:", text_color);
+	disp_color_str(" EIP:", text_color);
 	disp_int(eip);
 
 	if(err_code != 0xFFFFFFFF)
 	{
-		disp_color_str("Error code:", text_color);
+		disp_color_str(" Error code:", text_color);
 		disp_int(err_code);
 	}
 }

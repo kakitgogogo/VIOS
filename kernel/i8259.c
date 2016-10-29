@@ -21,14 +21,14 @@ PUBLIC void init_8259A()
 
 	out_byte(INT_S_CTLMASK, 0x1);
 
-	out_byte(INT_M_CTLMASK, 0xFD);
+	out_byte(INT_M_CTLMASK, 0xFF);
 
 	out_byte(INT_S_CTLMASK, 0xFF);
 }
 
 PUBLIC void spurious_irq(int irq)
 {
-	disp_str("The Interrupt Number: ");
+	disp_str("Spurious_irq: ");
 	disp_int(irq);
 	disp_str("\n");
 }

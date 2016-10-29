@@ -23,7 +23,9 @@ DASMFLAGS		=	-u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
 # Object
 VIOSBOOT		=	boot/boot.bin boot/loader.bin
 VIOSKERNEL		=	kernel.bin
-OBJS			=	kernel/kernel.o kernel/start.o kernel/i8259.o kernel/global.o kernel/protect.o lib/klib.o lib/kliba.o lib/string.o
+OBJS			=	kernel/kernel.o kernel/start.o kernel/i8259.o \
+					kernel/global.o kernel/protect.o lib/klib.o \
+					lib/kliba.o lib/string.o kernel/main.o
 DASMOUTPUT		=	kernel.bin.asm
 
 # image
@@ -63,14 +65,20 @@ boot/loader.bin: 	boot/loader.asm boot/include/load.inc \
 				boot/include/func.inc 
 		$(ASM) $(ASMBFLAGS) -o $@ $<
 
-kernel/kernel.o:	kernel/kernel.asm
+kernel/kernel.o:	kernel/kernel.asm include/sconst.inc
 		$(ASM) $(ASMKFLAGS) -o $@ $<
 
 $(VIOSKERNEL):	$(OBJS)
 		$(LD) $(LDFLAGS) -o $(VIOSKERNEL) $(OBJS)
 
 kernel/start.o:	kernel/start.c include/type.h include/const.h \
-				include/protect.h include/proto.h include/string.h
+				include/protect.h include/proto.h include/string.h \
+				include/proc.h
+		$(CC) $(CFLAGS) -o $@ $<
+
+kernel/main.o: 	kernel/main.c include/type.h include/const.h \
+				include/protect.h include/proto.h include/string.h \
+				include/proc.h
 		$(CC) $(CFLAGS) -o $@ $<
 
 kernel/i8259.o: 	kernel/i8259.c include/type.h include/const.h \

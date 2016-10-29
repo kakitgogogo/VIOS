@@ -9,5 +9,5 @@ OffsetOfKernel		equ	 0h
 BaseOfKernelPhyAddr	equ	BaseOfKernel * 10h
 KernelEntryPhyAddr	equ	030400h
 
-PageDirBase				equ	200000h	
-PageTblBase				equ	201000h
+PageDirBase				equ	100000h	
+PageTblBase				equ	101000h

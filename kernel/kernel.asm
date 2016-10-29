@@ -1,11 +1,14 @@
-SELECTOR_KERNEL_CS	equ	8
+%include "sconst.inc"
 
 extern	cstart
+extern	kernel_main
 extern	exception_handler
 extern	spurious_irq
 
 extern	gdt_ptr
 extern	idt_ptr
+extern	proc_ready
+extern	tss
 extern	disp_pos
 
 
@@ -16,6 +19,8 @@ StackTop:
 [SECTION .text]
 
 global	_start
+
+global	restart
 
 global	divide_error
 global	single_step_exception
@@ -62,10 +67,17 @@ _start:
 	lgdt	[gdt_ptr]
 	lidt	[idt_ptr]
 
+	; jump in order to use new gdt and new idt
 	jmp		SELECTOR_KERNEL_CS:csinit
 csinit:
-	sti
-	hlt
+	xor		eax, eax
+	mov		ax, SELECTOR_TSS
+	ltr		ax
+
+	;sti
+	jmp		kernel_main
+
+	;hlt
 
 
 ;-------------------------------------------------------------------------------------
@@ -94,7 +106,7 @@ csinit:
 ; set up hardware interrupt handler
 ;-------------------------------------------------------------------------------------
 ALIGN   16
-hwint00:		hwint_master		0
+hwint00:		iretd
 ALIGN   16
 hwint01:		hwint_master		1
 ALIGN   16
@@ -200,3 +212,24 @@ exception:
 	add		esp, 4*2
 EFLAGS:
 	hlt	
+;-------------------------------------------------------------------------------------
+
+;-------------------------------------------------------------------------------------
+; function restart
+;-------------------------------------------------------------------------------------
+restart:
+	mov		esp, [proc_ready]
+	lldt	[esp + P_LDT_SELECTOR]
+	lea		eax, [esp + P_STACKTOP]
+	mov	dword [tss + TSS3_S_SP0], eax
+
+	pop		gs
+	pop		fs
+	pop		es
+	pop		ds
+	popad
+
+	add		esp, 4
+
+	iretd
+;-------------------------------------------------------------------------------------
