@@ -1,7 +1,0 @@
-#!/bin/bash
-
-if [ $# -gt 0 ]
-then	
-	nasm $1.asm -o $1.com
-	mkisofs -r -o $1.iso /home/kakit/code/myOS/myOS/$1.com
-fi
