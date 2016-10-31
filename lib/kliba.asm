@@ -1,3 +1,4 @@
+%include "sconst.inc"
 extern	disp_pos
 
 [SECTION .text]
@@ -6,6 +7,8 @@ global	disp_str
 global	disp_color_str
 global	out_byte
 global	in_byte
+global	enable_irq
+global	disable_irq
 
 ;-------------------------------------------------------------------------------------
 ; function disp_str
@@ -16,7 +19,7 @@ disp_str:
 	push	ebp
 	mov		ebp, esp
 
-	mov		esi, [ebp + 8]	; pszInfo
+	mov		esi, [ebp + 8]
 	mov		edi, [disp_pos]
 	mov		ah, 0Fh
 .1:
@@ -116,4 +119,66 @@ in_byte:
 	nop	
 	nop
 	ret
+;-------------------------------------------------------------------------------------
+
+
+;-------------------------------------------------------------------------------------
+; function enable_irq
+;-------------------------------------------------------------------------------------
+; void enable_irq(int irq);
+;-------------------------------------------------------------------------------------
+enable_irq:
+	mov		ecx, [esp + 4]
+	pushf
+	cli
+	mov		ah, ~1
+	rol		ah, cl
+
+	cmp		cl, 8
+	jae		.enable_slave
+.enable_master:
+	in		al, INT_M_CTLMASK	
+	and		al, ah
+	out		INT_M_CTLMASK, al
+
+	popf
+	ret
+.enable_slave:
+	in		al, INT_S_CTLMASK	
+	and		al, ah
+	out		INT_S_CTLMASK, al
+
+	popf
+	ret	
+;-------------------------------------------------------------------------------------
+
+
+;-------------------------------------------------------------------------------------
+; function disable_irq
+;-------------------------------------------------------------------------------------
+; void disable_irq(int irq);
+;-------------------------------------------------------------------------------------
+disable_irq:
+	mov		ecx, [esp + 4]
+	pushf
+	cli
+	mov		ah, 1
+	rol		ah, cl
+
+	cmp		cl, 8
+	jae		.disable_slave
+.disable_master:
+	in		al, INT_M_CTLMASK	
+	or		al, ah
+	out		INT_M_CTLMASK, al
+
+	popf
+	ret
+.disable_slave:
+	in		al, INT_S_CTLMASK	
+	or		al, ah
+	out		INT_S_CTLMASK, al
+
+	popf
+	ret	
 ;-------------------------------------------------------------------------------------

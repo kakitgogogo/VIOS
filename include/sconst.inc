@@ -11,14 +11,18 @@ EDIREG			equ	DSREG			+ 4
 ESIREG			equ	EDIREG			+ 4
 EBPREG			equ	ESIREG			+ 4
 KERNELESPREG	equ	EBPREG			+ 4
+
 EBXREG			equ	KERNELESPREG	+ 4
 EDXREG			equ	EBXREG			+ 4
 ECXREG			equ	EDXREG			+ 4
 EAXREG			equ	ECXREG			+ 4
+
 RETADR			equ	EAXREG			+ 4
+
 EIPREG			equ	RETADR			+ 4
 CSREG			equ	EIPREG			+ 4
 EFLAGSREG		equ	CSREG			+ 4
+
 ESPREG			equ	EFLAGSREG		+ 4
 SSREG			equ	ESPREG			+ 4
 

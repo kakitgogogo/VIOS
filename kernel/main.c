@@ -16,6 +16,7 @@ PUBLIC int kernel_main()
 	u16 selector_ldt = SELECTOR_LDT_FIRST;	
 
 	int i;
+	int prio[NR_TASKS] = {15, 5, 3};
 	for(i = 0; i < NR_TASKS; ++i)
 	{
 		//strcpy(proc->pname, task->name);
@@ -41,16 +42,25 @@ PUBLIC int kernel_main()
 		proc->regs.esp = (u32)(stack_top);
 		proc->regs.eflags = 0x1202;
 
+		proc->ticks = proc->priority = prio[i];
+
 		stack_top -= task->stacksize;
 		++proc;
 		++task;
 		selector_ldt += 1<<3;
 	}
 	
-
-	k_reenter = -1;
+	ticks = 0;
+	k_reenter = 0;
 
 	proc_ready = proc_table;
+
+	out_byte(TIMER_MODE, RATE_GENERATOR);
+	out_byte(TIMER0, (u8)(TIMER_FREQ / HZ));
+	out_byte(TIMER0, (u8)((TIMER_FREQ / HZ) >> 8));
+
+	put_irq_handler(CLOCK_IRQ, clock_handler);
+	enable_irq(CLOCK_IRQ);
 
 	restart();
 
@@ -62,10 +72,9 @@ void testA()
 	int i = 0;
 	while(1)
 	{
-		disp_str("A");
-		disp_int(i++);
-		disp_str(" ");
-		delay(1000);
+		disp_str("A ");
+		//disp_int(get_ticks());
+		milli_delay(10);
 	}
 }
 
@@ -74,9 +83,19 @@ void testB()
 	int i = 0;
 	while(1)
 	{
-		disp_str("B");
-		disp_int(i++);
-		disp_str(" ");
-		delay(1000);
+		disp_str("B ");
+		//disp_int(i++);
+		milli_delay(10);
+	}
+}
+
+void testC()
+{
+	int i = 0;
+	while(1)
+	{
+		disp_str("C ");
+		//disp_int(i++);
+		milli_delay(10);
 	}
 }

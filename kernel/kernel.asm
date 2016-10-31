@@ -8,6 +8,9 @@ extern	spurious_irq
 extern	disp_str
 extern	delay
 extern	clock_handler
+extern	irq_table
+extern	enable_irq
+extern	disable_irq
 
 ; extern global variable
 extern	gdt_ptr
@@ -16,6 +19,9 @@ extern	proc_ready
 extern	tss
 extern	disp_pos
 extern	k_reenter
+extern	sys_call_table
+
+bits 32
 
 [SECTION .data]
 clock_int_msg	db		"-",0
@@ -29,6 +35,7 @@ StackTop:
 global	_start
 
 global	restart
+global	sys_call
 
 global	divide_error
 global	single_step_exception
@@ -92,10 +99,25 @@ csinit:
 ; macro hwint_master (master hardware interrupt)
 ;-------------------------------------------------------------------------------------
 %macro	hwint_master		1
+	call	save
+
+	in		al, INT_M_CTLMASK
+	or		al, (1 << %1)
+	out		INT_M_CTLMASK, al
+
+	mov		al, EOI
+	out		INT_M_CTL, al
+
+	sti
 	push	%1
-	call	spurious_irq
-	add		esp, 4
-	hlt
+	call	[irq_table + 4 * %1]
+	pop		ecx
+	cli
+
+	in		al, INT_M_CTLMASK
+	and		al, ~(1 << %1)
+	out		INT_M_CTLMASK, al
+	ret
 %endmacro
 ;-------------------------------------------------------------------------------------
 
@@ -114,55 +136,7 @@ csinit:
 ; set up hardware interrupt handler
 ;-------------------------------------------------------------------------------------
 ALIGN   16
-hwint00:	
-	sub		esp, 4
-	pushad
-	push	ds
-	push	es
-	push	fs
-	push	gs
-
-
-	mov	byte [gs: 158], 1
-	inc	byte [gs: 159]
-
-	mov		al, EOI
-	out		INT_M_CTL, al
-
-	inc	dword [k_reenter]
-	cmp	dword [k_reenter], 0
-	jne		.re_enter
-
-	mov		esp, StackTop
-
-	sti
-
-	push	0
-	call	clock_handler
-	add		esp, 4
-
-	push	1000
-	call	delay
-	add		esp, 4
-
-	cli
-
-	mov		esp, [proc_ready]
-	lldt	[esp + P_LDT_SELECTOR]
-	lea		eax, [esp + P_STACKTOP]
-	mov	dword [tss + TSS3_S_SP0], eax
-
-.re_enter:
-	dec	dword [k_reenter]
-	pop		gs
-	pop		fs
-	pop		es
-	pop		ds
-	popad
-	add		esp, 4
-
-	iretd
-
+hwint00:		hwint_master		0
 ALIGN   16
 hwint01:		hwint_master		1
 ALIGN   16
@@ -266,18 +240,66 @@ copr_error:
 exception:
 	call	exception_handler
 	add		esp, 4*2
-EFLAGS:
+
 	hlt	
 ;-------------------------------------------------------------------------------------
 
+
 ;-------------------------------------------------------------------------------------
-; function restart
+; function sys_call
+;-------------------------------------------------------------------------------------
+sys_call:
+	call	save
+
+	sti
+
+	call	[sys_call_table + eax * 4]
+	mov		[esi + EAXREG - P_STACKBASE], eax
+
+	cli
+
+	ret
+;-------------------------------------------------------------------------------------
+
+;-------------------------------------------------------------------------------------
+; function save
+;-------------------------------------------------------------------------------------
+save:
+	pushad
+	push	ds
+	push	es
+	push	fs
+	push	gs
+	
+	mov		dx, ss
+	mov		ds, dx
+	mov		es, dx
+
+	mov		esi, esp
+
+	inc	dword [k_reenter]
+	cmp	dword [k_reenter], 0
+	jne		.1
+	mov		esp, StackTop
+
+	push	restart
+	jmp		[esi + RETADR - P_STACKBASE]
+.1:
+	push	restart_reenter
+	jmp		[esi + RETADR - P_STACKBASE]
+;-------------------------------------------------------------------------------------
+
+
+;-------------------------------------------------------------------------------------
+; function restart and restart_reenter
 ;-------------------------------------------------------------------------------------
 restart:
 	mov		esp, [proc_ready]
 	lldt	[esp + P_LDT_SELECTOR]
 	lea		eax, [esp + P_STACKTOP]
 	mov	dword [tss + TSS3_S_SP0], eax
+restart_reenter:
+	dec	dword [k_reenter]
 
 	pop		gs
 	pop		fs

@@ -13,15 +13,30 @@ PUBLIC u32	seg2phys(u16 selector);
 
 /*	 i8259.c 		*/
 PUBLIC void	init_8259A();
+PUBLIC void	put_irq_handler(int irq, irq_handler handler);
+PUBLIC void	spurious_irq(int irq);
 
 /*	 klib.c 		*/
-PUBLIC void delay();
+PUBLIC void	delay(int time);
 
 /*	 kernel.asm 	*/
-PUBLIC void restart();
+PUBLIC void	restart();
+PUBLIC void	sys_call();
+
+/*	 clock.c 		*/
+PUBLIC void	clock_handler(int irq);
+PUBLIC void	milli_delay(int milli_sec);
 
 /*	 main.c 		*/
-PUBLIC void testA();
-PUBLIC void testB();
+PUBLIC void	testA();
+PUBLIC void	testB();
+PUBLIC void	testC();
+
+/*	 proc.c 		*/
+PUBLIC int	sys_get_ticks();
+PUBLIC void	schedule();
+
+/*	 syscall.asm 	*/
+PUBLIC int	get_ticks();
 
 #endif

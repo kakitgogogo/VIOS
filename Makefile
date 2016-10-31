@@ -26,7 +26,7 @@ VIOSKERNEL		=	kernel.bin
 OBJS			=	kernel/kernel.o kernel/start.o kernel/i8259.o \
 					kernel/global.o kernel/protect.o lib/klib.o \
 					lib/kliba.o lib/string.o kernel/main.o \
-					kernel/clock.o
+					kernel/clock.o kernel/syscall.o kernel/proc.o
 DASMOUTPUT		=	kernel.bin.asm
 
 # image
@@ -93,6 +93,12 @@ kernel/global.o:	kernel/global.c
 		$(CC) $(CFLAGS) -o $@ $<
 
 kernel/protect.o:kernel/protect.c
+		$(CC) $(CFLAGS) -o $@ $<
+
+kernel/syscall.o:kernel/syscall.asm include/sconst.inc
+		$(ASM) $(ASMKFLAGS) -o $@ $<
+
+kernel/proc.o:	kernel/proc.c
 		$(CC) $(CFLAGS) -o $@ $<
 
 lib/klib.o: 		lib/klib.c

@@ -69,7 +69,6 @@ typedef struct s_tss
 #define	SELECTOR_KERNEL_GS	SELECTOR_VIDEO
 
 #define	LDT_SIZE				2
-
 #define SELECTOR_IN_LDT(n)	n * 8
 
 #define	SA_RPL_MASK			0xFFFC
@@ -123,6 +122,8 @@ typedef struct s_tss
 
 #define	INT_VECTOR_IRQ0				0x20
 #define	INT_VECTOR_IRQ8				0x28
+
+#define	INT_VECTOR_SYS_CALL			0x90
 
 #define	vir2phys(seg_base, vir) (u32)(((u32)seg_base) + (u32)(vir))
 
