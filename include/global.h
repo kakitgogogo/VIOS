@@ -19,12 +19,18 @@ EXTERN	u32			k_reenter;
 EXTERN	TSS			tss;
 EXTERN	PROCESS*	proc_ready;
 
+EXTERN	int			current_console_id;
+
 extern	PROCESS		proc_table[NR_TASKS];
 extern	char		task_stack[STACK_SIZE_TOTAL];
 
 extern	TASK		task_table[NR_TASKS];
+
 extern	irq_handler	irq_table[NR_IRQ];
 
 extern	system_call	sys_call_table[NR_SYS_CALL];
+
+extern	TTY			tty_table[NR_CONSOLES];
+extern	CONSOLE		console_table[NR_CONSOLES];
 
 #endif

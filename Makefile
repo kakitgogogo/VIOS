@@ -26,7 +26,8 @@ VIOSKERNEL		=	kernel.bin
 OBJS			=	kernel/kernel.o kernel/start.o kernel/i8259.o \
 					kernel/global.o kernel/protect.o lib/klib.o \
 					lib/kliba.o lib/string.o kernel/main.o \
-					kernel/clock.o kernel/syscall.o kernel/proc.o
+					kernel/clock.o kernel/syscall.o kernel/proc.o \
+					kernel/keyborad.o kernel/tty.o kernel/console.o
 DASMOUTPUT		=	kernel.bin.asm
 
 # image
@@ -83,6 +84,15 @@ kernel/main.o: 	kernel/main.c include/type.h include/const.h \
 		$(CC) $(CFLAGS) -o $@ $<
 
 kernel/clock.o:	kernel/clock.c
+		$(CC) $(CFLAGS) -o $@ $<
+
+kernel/keyborad.o: kernel/keyboard.c
+		$(CC) $(CFLAGS) -o $@ $<
+
+kernel/tty.o:		kernel/tty.c
+		$(CC) $(CFLAGS) -o $@ $<
+
+kernel/console.o:		kernel/console.c
 		$(CC) $(CFLAGS) -o $@ $<
 
 kernel/i8259.o: 	kernel/i8259.c include/type.h include/const.h \

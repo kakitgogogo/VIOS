@@ -1,14 +1,17 @@
-#include "type.h"
 #include "const.h"
+#include "type.h"
 #include "protect.h"
-#include "proto.h"
 #include "proc.h"
 #include "string.h"
+#include "tty.h"
+#include "console.h"
 #include "global.h"
+#include "proto.h"
+#include "keyboard.h"
 
 PUBLIC int kernel_main()
 {
-	disp_str("Test Process...\n");
+	disp_str("Welcome to VIOS\n");
 
 	PROCESS* proc = proc_table;
 	TASK* task = task_table;
@@ -16,7 +19,7 @@ PUBLIC int kernel_main()
 	u16 selector_ldt = SELECTOR_LDT_FIRST;	
 
 	int i;
-	int prio[NR_TASKS] = {15, 5, 3};
+	int prio[NR_TASKS] = {150, 15, 5, 3};
 	for(i = 0; i < NR_TASKS; ++i)
 	{
 		//strcpy(proc->pname, task->name);
@@ -55,16 +58,12 @@ PUBLIC int kernel_main()
 
 	proc_ready = proc_table;
 
-	out_byte(TIMER_MODE, RATE_GENERATOR);
-	out_byte(TIMER0, (u8)(TIMER_FREQ / HZ));
-	out_byte(TIMER0, (u8)((TIMER_FREQ / HZ) >> 8));
-
-	put_irq_handler(CLOCK_IRQ, clock_handler);
-	enable_irq(CLOCK_IRQ);
+	clock_init();
+	keyboard_init();
 
 	restart();
 
-	while(1){}
+	while(1);
 }
 
 void testA()
@@ -72,7 +71,7 @@ void testA()
 	int i = 0;
 	while(1)
 	{
-		disp_str("A ");
+		//disp_str("A ");
 		//disp_int(get_ticks());
 		milli_delay(10);
 	}
@@ -83,7 +82,7 @@ void testB()
 	int i = 0;
 	while(1)
 	{
-		disp_str("B ");
+		//disp_str("B ");
 		//disp_int(i++);
 		milli_delay(10);
 	}
@@ -94,7 +93,7 @@ void testC()
 	int i = 0;
 	while(1)
 	{
-		disp_str("C ");
+		//disp_str("C ");
 		//disp_int(i++);
 		milli_delay(10);
 	}

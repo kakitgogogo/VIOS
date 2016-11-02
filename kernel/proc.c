@@ -1,10 +1,12 @@
-#include "type.h"
 #include "const.h"
+#include "type.h"
 #include "protect.h"
-#include "proto.h"
 #include "proc.h"
 #include "string.h"
+#include "tty.h"
+#include "console.h"
 #include "global.h"
+#include "proto.h"
 
 PUBLIC int sys_get_ticks()
 {

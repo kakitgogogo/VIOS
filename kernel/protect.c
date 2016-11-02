@@ -1,7 +1,10 @@
-#include "type.h"
 #include "const.h"
+#include "type.h"
 #include "protect.h"
 #include "proc.h"
+#include "string.h"
+#include "tty.h"
+#include "console.h"
 #include "global.h"
 #include "proto.h"
 
@@ -65,7 +68,7 @@ PRIVATE void init_idt_desc(u8 vector, u8 desc_type, int_handler handler, u8 priv
 	p_gate->offset_high	= (base >> 16) & 0xFFFF;
 }
 
-PUBLIC void init_prot()
+PUBLIC void protect_init()
 {
 	init_8259A();
 

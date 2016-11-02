@@ -1,6 +1,7 @@
 #ifndef VIOS_PROTECT_H
 #define VIOS_PROTECT_H
 
+/* Data/Code/System Descriptor */
 typedef struct s_descriptor
 {
 	u16	limit_low;
@@ -11,6 +12,7 @@ typedef struct s_descriptor
 	u8	base_high;
 }DESCRIPTOR;
 
+/* Gate Descriptor */
 typedef struct s_gate
 {
 	u16	offset_low;
@@ -20,6 +22,7 @@ typedef struct s_gate
 	u16	offset_high;
 }GATE;
 
+/* TSS */
 typedef struct s_tss
 {
 	u32	backlink;
@@ -50,6 +53,7 @@ typedef struct s_tss
 	u16	iobase;
 }TSS;
 
+/* GDT Index */
 #define	INDEX_DUMMY			0
 #define	INDEX_FLAT_C			1
 #define	INDEX_FLAT_RW		2
@@ -57,6 +61,7 @@ typedef struct s_tss
 #define	INDEX_TSS			4
 #define	INDEX_LDT_FIRST		5
 
+/* Selector */
 #define	SELECTOR_DEMMY		0
 #define	SELECTOR_FLAT_C		0x08
 #define	SELECTOR_FLAT_RW		0x10
@@ -68,9 +73,11 @@ typedef struct s_tss
 #define	SELECTOR_KERNEL_DS	SELECTOR_FLAT_RW
 #define	SELECTOR_KERNEL_GS	SELECTOR_VIDEO
 
+/* LDT Constant and Macro */
 #define	LDT_SIZE				2
 #define SELECTOR_IN_LDT(n)	n * 8
 
+/* Seletor Attribute */
 #define	SA_RPL_MASK			0xFFFC
 #define	SA_RPL0				0
 #define	SA_RPL1				1
@@ -81,6 +88,7 @@ typedef struct s_tss
 #define	SA_TIG				0
 #define	SA_TIL				4
 
+/* Descriptor Attribute */
 #define	DA_32				0x4000
 #define	DA_LIMIT_4K			0x8000
 #define	DA_DPL0				0x00
@@ -103,6 +111,7 @@ typedef struct s_tss
 #define	DA_386IGate			0x8E
 #define	DA_386TGate			0x8F
 
+/* Interrupt Vector */
 #define	INT_VECTOR_DIVIDE			0x0
 #define	INT_VECTOR_DEBUG				0x1
 #define	INT_VECTOR_NMI				0x2
@@ -125,6 +134,7 @@ typedef struct s_tss
 
 #define	INT_VECTOR_SYS_CALL			0x90
 
+/* Macro: Linear Address -> Physical Address */
 #define	vir2phys(seg_base, vir) (u32)(((u32)seg_base) + (u32)(vir))
 
 #endif
