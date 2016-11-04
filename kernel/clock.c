@@ -20,13 +20,11 @@ PUBLIC void clock_init()
 
 PUBLIC void clock_handler(int irq)
 {
-	//disp_str(".");
 	++ticks;
 	--proc_ready->ticks;
 
 	if(k_reenter != 0)
 	{
-		//disp_str("!");
 		return;
 	}
 

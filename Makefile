@@ -27,7 +27,8 @@ OBJS			=	kernel/kernel.o kernel/start.o kernel/i8259.o \
 					kernel/global.o kernel/protect.o lib/klib.o \
 					lib/kliba.o lib/string.o kernel/main.o \
 					kernel/clock.o kernel/syscall.o kernel/proc.o \
-					kernel/keyborad.o kernel/tty.o kernel/console.o
+					kernel/keyborad.o kernel/tty.o kernel/console.o \
+					kernel/printf.o kernel/vsprintf.o
 DASMOUTPUT		=	kernel.bin.asm
 
 # image
@@ -102,14 +103,21 @@ kernel/i8259.o: 	kernel/i8259.c include/type.h include/const.h \
 kernel/global.o:	kernel/global.c
 		$(CC) $(CFLAGS) -o $@ $<
 
-kernel/protect.o:kernel/protect.c
+kernel/protect.o: kernel/protect.c
 		$(CC) $(CFLAGS) -o $@ $<
 
-kernel/syscall.o:kernel/syscall.asm include/sconst.inc
+kernel/syscall.o: kernel/syscall.asm include/sconst.inc
 		$(ASM) $(ASMKFLAGS) -o $@ $<
 
 kernel/proc.o:	kernel/proc.c
 		$(CC) $(CFLAGS) -o $@ $<
+
+kernel/printf.o:	kernel/printf.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+kernel/vsprintf.o: kernel/vsprintf.c
+	$(CC) $(CFLAGS) -o $@ $<
+
 
 lib/klib.o: 		lib/klib.c
 		$(CC) $(CFLAGS) -o $@ $<

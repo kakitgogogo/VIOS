@@ -54,6 +54,8 @@ typedef enum
 /* 8042 */
 #define	KB_DATA			0x60
 #define	KB_CMD			0x64
+#define	LED_CODE			0xED
+#define	KB_ACK			0xFA
 
 /* Hardware Interrupt Request */
 #define	NR_IRQ			16
@@ -68,9 +70,6 @@ typedef enum
 #define	PRINTER_IRQ		7
 #define	AT_WINI_IRQ		14
 
-/* System Call */
-#define	NR_SYS_CALL     	1
-
 /* VGA */
 #define	CRTC_ADDR_REG	0x3D4
 #define	CRTC_DATA_REG	0x3D5
@@ -83,5 +82,8 @@ typedef enum
 
 /* TTY */
 #define	NR_CONSOLES		3
+
+/* System Call */
+#define	NR_SYS_CALL		2
 
 #endif

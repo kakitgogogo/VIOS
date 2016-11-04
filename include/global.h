@@ -21,10 +21,11 @@ EXTERN	PROCESS*	proc_ready;
 
 EXTERN	int			current_console_id;
 
-extern	PROCESS		proc_table[NR_TASKS];
+extern	PROCESS		proc_table[NR_TASKS + NR_PROCS];
 extern	char		task_stack[STACK_SIZE_TOTAL];
 
 extern	TASK		task_table[NR_TASKS];
+extern	TASK		user_proc_table[NR_PROCS];
 
 extern	irq_handler	irq_table[NR_IRQ];
 

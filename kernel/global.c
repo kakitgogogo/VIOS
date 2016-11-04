@@ -10,12 +10,16 @@
 #include "global.h"
 #include "proto.h"
 
-PUBLIC	PROCESS		proc_table[NR_TASKS];
+PUBLIC	PROCESS		proc_table[NR_TASKS + NR_PROCS];
 
 PUBLIC	char		task_stack[STACK_SIZE_TOTAL];
 
 PUBLIC	TASK		task_table[NR_TASKS] = {
-	{task_tty, STACK_SIZE_TTY, "tty"},
+	{task_tty, STACK_SIZE_TTY, "tty"}
+};
+
+PUBLIC	TASK		user_proc_table[NR_PROCS] = {
+	
 	{testA, STACK_SIZE_TESTA, "testA"},
 	{testB, STACK_SIZE_TESTB, "testB"},
 	{testC, STACK_SIZE_TESTC, "testC"}
@@ -24,7 +28,8 @@ PUBLIC	TASK		task_table[NR_TASKS] = {
 PUBLIC	irq_handler	irq_table[NR_IRQ];
 
 PUBLIC	system_call	sys_call_table[NR_SYS_CALL] = {
-	sys_get_ticks
+	sys_get_ticks,
+	sys_write
 };
 
 PUBLIC	TTY			tty_table[NR_CONSOLES];

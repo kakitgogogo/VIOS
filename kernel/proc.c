@@ -8,11 +8,6 @@
 #include "global.h"
 #include "proto.h"
 
-PUBLIC int sys_get_ticks()
-{
-	return ticks;
-}
-
 PUBLIC void schedule()
 {
 	PROCESS *p;
@@ -20,7 +15,7 @@ PUBLIC void schedule()
 
 	while(!greatest_ticks)
 	{
-		for(p = proc_table; p < proc_table + NR_TASKS; ++p)
+		for(p = proc_table; p < proc_table + NR_TASKS + NR_PROCS; ++p)
 		{
 			if(p->ticks > greatest_ticks)
 			{
@@ -30,10 +25,21 @@ PUBLIC void schedule()
 		}
 		if(!greatest_ticks)
 		{
-			for(p = proc_table; p < proc_table + NR_TASKS; ++p)
+			for(p = proc_table; p < proc_table + NR_TASKS + NR_PROCS; ++p)
 			{
 				p->ticks = p->priority;
 			}
 		}
 	}
+}
+
+PUBLIC int sys_get_ticks()
+{
+	return ticks;
+}
+
+PUBLIC int sys_write(char* buf, int len, PROCESS* proc)
+{
+	tty_write(&tty_table[proc->tty_id], buf, len);
+	return 0;
 }

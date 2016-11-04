@@ -133,3 +133,15 @@ PUBLIC void in_process(TTY* tty, u32 key)
 		}
 	}
 }
+
+PUBLIC void tty_write(TTY* tty, char* buf, int len)
+{
+	char *p = buf;
+	int i = len;
+
+	while(i)
+	{
+		out_char(tty->console, *p++);
+		--i;
+	}
+}

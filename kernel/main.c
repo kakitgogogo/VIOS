@@ -19,33 +19,52 @@ PUBLIC int kernel_main()
 	u16 selector_ldt = SELECTOR_LDT_FIRST;	
 
 	int i;
-	int prio[NR_TASKS] = {150, 15, 5, 3};
-	for(i = 0; i < NR_TASKS; ++i)
+	int prio[NR_TASKS + NR_PROCS] = {100, 15, 5, 3};
+	int tty_ids[NR_TASKS + NR_PROCS] = {0, 0, 1, 2};
+	u8 privilege, rpl;
+	u32 eflags;
+	for(i = 0; i < NR_TASKS + NR_PROCS; ++i)
 	{
-		//strcpy(proc->pname, task->name);
+		if(i < NR_TASKS)
+		{
+			task = task_table + i;
+			privilege = PRIVILEGE_TASK;
+			rpl = RPL_TASK;
+			eflags = 0x1202;
+		}
+		else
+		{
+			task = user_proc_table + (i - NR_TASKS);
+			privilege = PRIVILEGE_USER;
+			rpl = RPL_USER;
+			eflags = 0x202;
+		}
+		strcpy(proc->pname, task->name);
 
 		proc->pid = i;
 
 		proc->ldt_selector = selector_ldt;
 
-		memcpy(&proc->ldts[0], &gdt[SELECTOR_KERNEL_CS>>3],sizeof(DESCRIPTOR));
-		proc->ldts[0].attr1 = DA_C | PRIVILEGE_TASK << 5;
+		memcpy(&proc->ldts[0], &gdt[SELECTOR_KERNEL_CS>>3], sizeof(DESCRIPTOR));
+		proc->ldts[0].attr1 = DA_C | privilege << 5;
 
-		memcpy(&proc->ldts[1], &gdt[SELECTOR_KERNEL_DS>>3],sizeof(DESCRIPTOR));
-		proc->ldts[1].attr1 = DA_DRW | PRIVILEGE_TASK << 5;
+		memcpy(&proc->ldts[1], &gdt[SELECTOR_KERNEL_DS>>3], sizeof(DESCRIPTOR));
+		proc->ldts[1].attr1 = DA_DRW | privilege << 5;
 
-		proc->regs.cs = (SELECTOR_IN_LDT(0) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | RPL_TASK;
-		proc->regs.ds = (SELECTOR_IN_LDT(1) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | RPL_TASK;
-		proc->regs.es = (SELECTOR_IN_LDT(1) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | RPL_TASK;
-		proc->regs.fs = (SELECTOR_IN_LDT(1) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | RPL_TASK;
-		proc->regs.ss = (SELECTOR_IN_LDT(1) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | RPL_TASK;
-		proc->regs.gs = (SELECTOR_KERNEL_GS & SA_RPL_MASK & SA_TI_MASK) | SA_TIG | RPL_TASK;
+		proc->regs.cs = (SELECTOR_IN_LDT(0) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | rpl;
+		proc->regs.ds = (SELECTOR_IN_LDT(1) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | rpl;
+		proc->regs.es = (SELECTOR_IN_LDT(1) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | rpl;
+		proc->regs.fs = (SELECTOR_IN_LDT(1) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | rpl;
+		proc->regs.ss = (SELECTOR_IN_LDT(1) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | rpl;
+		proc->regs.gs = (SELECTOR_KERNEL_GS & SA_RPL_MASK & SA_TI_MASK) | SA_TIG | rpl;
 
 		proc->regs.eip = (u32)task->initial_eip;
 		proc->regs.esp = (u32)(stack_top);
-		proc->regs.eflags = 0x1202;
+		proc->regs.eflags = eflags;
 
 		proc->ticks = proc->priority = prio[i];
+
+		proc->tty_id = tty_ids[i];
 
 		stack_top -= task->stacksize;
 		++proc;
@@ -71,9 +90,8 @@ void testA()
 	int i = 0;
 	while(1)
 	{
-		//disp_str("A ");
-		//disp_int(get_ticks());
-		milli_delay(10);
+		printf("<Ticks: %x>", get_ticks());
+		milli_delay(1000);
 	}
 }
 
@@ -82,9 +100,8 @@ void testB()
 	int i = 0;
 	while(1)
 	{
-		//disp_str("B ");
-		//disp_int(i++);
-		milli_delay(10);
+		printf("B");
+		milli_delay(1000);
 	}
 }
 
@@ -93,8 +110,7 @@ void testC()
 	int i = 0;
 	while(1)
 	{
-		//disp_str("C ");
-		//disp_int(i++);
-		milli_delay(10);
+		printf("C");
+		milli_delay(1000);
 	}
 }

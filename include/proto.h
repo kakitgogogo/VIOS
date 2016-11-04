@@ -23,6 +23,11 @@ PUBLIC void	delay(int time);
 PUBLIC void	restart();
 PUBLIC void	sys_call();
 
+/*	 main.c 		*/
+PUBLIC void	testA();
+PUBLIC void	testB();
+PUBLIC void	testC();
+
 /*	 clock.c 		*/
 PUBLIC void	clock_init();
 PUBLIC void	clock_handler(int irq);
@@ -35,21 +40,25 @@ PUBLIC void	keyboard_handler();
 /*	tty.c		*/
 PUBLIC void	task_tty();
 PUBLIC void	in_process(TTY* tty, u32 key);
-
-/*	 main.c 		*/
-PUBLIC void	testA();
-PUBLIC void	testB();
-PUBLIC void	testC();
-
-/*	 proc.c 		*/
-PUBLIC int	sys_get_ticks();
-PUBLIC void	schedule();
-
-/*	 syscall.asm 	*/
-PUBLIC int	get_ticks();
+PUBLIC void	tty_write(TTY* tty, char* buf, int len);
 
 /*	 console.c 	*/
 PUBLIC void	out_char(CONSOLE* console, char ch);
 PUBLIC void	scroll_screen(CONSOLE* console, int direction);
+
+/*	 printf.c 	*/
+PUBLIC int	printf(const char *fmt, ...);
+
+/*	 vsprintf.c 	*/
+PUBLIC int	vsprintf(char *buf, const char *fmt, va_list args);
+
+/*	 proc.c 		*/
+PUBLIC int	sys_get_ticks();
+PUBLIC int	sys_write(char* buf, int len, PROCESS* proc);
+PUBLIC void	schedule();
+
+/*	 syscall.asm 	*/
+PUBLIC int	get_ticks();
+PUBLIC void	write(char* buf, int len);
 
 #endif

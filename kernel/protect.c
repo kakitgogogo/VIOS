@@ -135,7 +135,7 @@ PUBLIC void protect_init()
 
 	int i;
 	u16 index_ldt = INDEX_LDT_FIRST;
-	for(i = 0; i < NR_TASKS; ++i)
+	for(i = 0; i < NR_TASKS + NR_PROCS; ++i)
 	{
 		init_descriptor(	
 			&gdt[index_ldt], 

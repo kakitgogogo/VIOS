@@ -34,11 +34,13 @@ typedef struct s_proc
 	u16			ldt_selector;
 	DESCRIPTOR	ldts[LDT_SIZE];
 
-	int ticks;
-	int priority;
+	int			ticks;
+	int			priority;
 
 	u32			pid;
 	char		pname[16];
+
+	int			tty_id;
 }PROCESS;
 
 typedef struct s_task
@@ -48,7 +50,8 @@ typedef struct s_task
 	char		name[32];
 }TASK;
 
-#define	NR_TASKS		4
+#define	NR_TASKS		1
+#define	NR_PROCS		3
 
 #define	STACK_SIZE_TTY		0x8000
 #define	STACK_SIZE_TESTA		0x8000

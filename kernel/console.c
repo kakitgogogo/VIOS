@@ -31,8 +31,11 @@ PRIVATE void set_video_start_addr(u32 addr)
 
 PRIVATE void flush(CONSOLE* console)
 {
-	set_cursor(console->cursor);
-	set_video_start_addr(console->current_start_addr);
+	if(is_current_console(console))
+	{
+		set_cursor(console->cursor);
+		set_video_start_addr(console->current_start_addr);
+	}
 }
 
 PUBLIC void scroll_screen(CONSOLE* console, int direction)
