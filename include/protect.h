@@ -75,7 +75,9 @@ typedef struct s_tss
 
 /* LDT Constant and Macro */
 #define	LDT_SIZE				2
-#define SELECTOR_IN_LDT(n)	n * 8
+#define	SELECTOR_IN_LDT(n)	n * 8
+#define	INDEX_LDT_C			0
+#define	INDEX_LDT_RW			1
 
 /* Seletor Attribute */
 #define	SA_RPL_MASK			0xFFFC

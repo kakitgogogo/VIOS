@@ -1,6 +1,25 @@
 #ifndef	VIOS_CONST_H
 #define	VIOS_CONST_H
 
+/* Macro assert */
+#define	ASSERT
+#ifdef	ASSERT
+void assertion_failure(char *exp, char *file, char *base_file, int line);
+#define	assert(exp)\
+	do\
+	{\
+		if(exp);\
+		else\
+		{\
+			assertion_failure(#exp, __FILE__, __BASE_FILE__, __LINE__);\
+		}\
+	}\
+	while(0)
+#else
+#define	assert(exp)
+#endif
+
+/* EXTERN */
 #define	EXTERN	extern
 
 /* Function Type */
@@ -22,7 +41,7 @@ typedef enum
 #define	BLUE	0x1
 #define	FLASH	0x80
 #define	BRIGHT	0x08
-#define COLOR(x, y) ((x << 4) | y)
+#define	COLOR(x, y) ((x << 4) | y)
 
 /* GDT Size and LDT Size */
 #define	GDT_SIZE		128
@@ -84,6 +103,42 @@ typedef enum
 #define	NR_CONSOLES		3
 
 /* System Call */
-#define	NR_SYS_CALL		2
+#define	NR_SYS_CALL		4
+
+/* String */
+#define	STR_DEFAULT_LEN	1024
+
+/* Process */
+#define	SENDING			0x02
+#define	RECEIVING		0x04
+
+/* Task */
+#define	INVALID_DRIVER	-20
+#define	INTERRUPT		-10
+#define	TASK_TTY			0
+#define	TASK_SYS			1
+#define	TASK_WINCH		2
+#define	TASK_FS			3
+#define	TASK_MM			4
+#define	ANY				(NR_TASKS + NR_PROCS + 10)
+#define	NO_TASK			(NR_TASKS + NR_PROCS + 20)
+
+/* IPC */
+#define	SEND			1
+#define	RECEIVE			2
+#define	BOTH			3	//BOTH = SEND | RECEIVE
+
+/* Magic Chars */
+#define	MAG_CH_PANIC		'\002'
+#define	MAG_CH_ASSERT	'\003'
+
+/* Message Type */
+enum msgtype
+{
+	HARD_INT = 1,
+	GET_TICKS,
+};
+
+#define	RETVAL			u.m3.m3i1
 
 #endif

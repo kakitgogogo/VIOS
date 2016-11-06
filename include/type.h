@@ -1,6 +1,7 @@
 #ifndef	VISO_TYPE_H
 #define	VIOS_TYPE_H
 
+typedef	unsigned long long	u64;
 typedef	unsigned int			u32;
 typedef	unsigned short		u16;
 typedef	unsigned char		u8;

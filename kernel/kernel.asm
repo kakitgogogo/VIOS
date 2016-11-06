@@ -251,17 +251,19 @@ exception:
 sys_call:
 	call	save
 
-	push	dword [proc_ready]
-
 	sti
+	push	esi
 
+	push	dword [proc_ready]
+	push	edx
 	push	ecx
 	push	ebx
 	call	[sys_call_table + eax * 4]
-	add		esp, 4 * 3
+	add		esp, 4 * 4
 	
 	mov		[esi + EAXREG - P_STACKBASE], eax
 
+	pop		esi
 	cli
 
 	ret
@@ -277,9 +279,14 @@ save:
 	push	fs
 	push	gs
 	
+	mov		esi, edx
+
 	mov		dx, ss
 	mov		ds, dx
 	mov		es, dx
+	mov		fs, dx
+
+	mov		edx, esi
 
 	mov		esi, esp
 

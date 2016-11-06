@@ -19,10 +19,9 @@ PUBLIC int kernel_main()
 	u16 selector_ldt = SELECTOR_LDT_FIRST;	
 
 	int i;
-	int prio[NR_TASKS + NR_PROCS] = {100, 15, 5, 3};
-	int tty_ids[NR_TASKS + NR_PROCS] = {0, 0, 1, 2};
+	int tty_ids[NR_TASKS + NR_PROCS] = {0, 0, 1, 2, 2};
 	u8 privilege, rpl;
-	u32 eflags;
+	u32 eflags, prio;
 	for(i = 0; i < NR_TASKS + NR_PROCS; ++i)
 	{
 		if(i < NR_TASKS)
@@ -31,6 +30,7 @@ PUBLIC int kernel_main()
 			privilege = PRIVILEGE_TASK;
 			rpl = RPL_TASK;
 			eflags = 0x1202;
+			prio = 15;
 		}
 		else
 		{
@@ -38,6 +38,7 @@ PUBLIC int kernel_main()
 			privilege = PRIVILEGE_USER;
 			rpl = RPL_USER;
 			eflags = 0x202;
+			prio = 5;
 		}
 		strcpy(proc->pname, task->name);
 
@@ -62,11 +63,19 @@ PUBLIC int kernel_main()
 		proc->regs.esp = (u32)(stack_top);
 		proc->regs.eflags = eflags;
 
-		proc->ticks = proc->priority = prio[i];
+		proc->ticks = proc->priority = prio;
+
+		proc->pflags = 0;
+		proc->pmsg = 0;
+		proc->recvfrom = NO_TASK;
+		proc->sendto = NO_TASK;
+		proc->has_int_msg = FALSE;
+		proc->sending = 0;
+		proc->next_sending = 0;
 
 		proc->tty_id = tty_ids[i];
 
-		stack_top -= task->stacksize;
+		stack_top -= task->stacksize;	
 		++proc;
 		++task;
 		selector_ldt += 1<<3;
@@ -85,12 +94,23 @@ PUBLIC int kernel_main()
 	while(1);
 }
 
+#if 1
+PUBLIC int get_ticks()
+{
+	MESSAGE msg;
+	reset_msg(&msg);
+	msg.type = GET_TICKS;
+	send_recv(BOTH, TASK_SYS, &msg);
+	return msg.RETVAL;
+}
+#endif
+
 void testA()
 {
 	int i = 0;
 	while(1)
 	{
-		printf("<Ticks: %x>", get_ticks());
+		printf("<Ticks: %d>", get_ticks());
 		milli_delay(1000);
 	}
 }
@@ -111,6 +131,6 @@ void testC()
 	while(1)
 	{
 		printf("C");
-		milli_delay(1000);
+		milli_delay(200);
 	}
 }

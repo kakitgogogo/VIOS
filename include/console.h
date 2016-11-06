@@ -16,5 +16,7 @@ typedef struct s_console
 #define 	SCREEN_WIDTH		80
 
 #define	DEFAULT_CHAR_COLOR 	0x0F
+#define	GRAY_CHAR			(COLOR(BLACK, BLACK) | BRIGHT)
+#define	RED_CHAR				0xF4
 
 #endif

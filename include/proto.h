@@ -1,11 +1,26 @@
 #ifndef	VIOS_PROTO_H
 #define	VIOS_PROTO_H
 
-/*	 klib.asm 	*/
+/*	 kliba.asm 	*/
 PUBLIC void	out_byte(u16 port, u8 value);
 PUBLIC u8	in_byte(u16 port);
 PUBLIC void	disp_str(char *info);
 PUBLIC void	disp_color_str(char *info, int color);
+PUBLIC void	enable_irq(int irq);
+PUBLIC void	disable_irq(int irq);
+PUBLIC void	enable_int();
+PUBLIC void	disable_int();
+
+/*	 klib.c 		*/
+PUBLIC void	delay(int time);
+PUBLIC void	disp_int(int input);
+PUBLIC char*	itoa(char* str, int num);
+
+/* string.asm */
+PUBLIC void*	memcpy(void *dst, void *src, int size);
+PUBLIC void*	memset(void* des, char ch, int size);
+PUBLIC char*	strcpy(char* dst, char* src);
+PUBLIC int	strlen(char* str);
 
 /*	 protect.c 	*/
 PUBLIC void	protect_init();
@@ -15,9 +30,6 @@ PUBLIC u32	seg2phys(u16 selector);
 PUBLIC void	init_8259A();
 PUBLIC void	put_irq_handler(int irq, irq_handler handler);
 PUBLIC void	spurious_irq(int irq);
-
-/*	 klib.c 		*/
-PUBLIC void	delay(int time);
 
 /*	 kernel.asm 	*/
 PUBLIC void	restart();
@@ -36,6 +48,7 @@ PUBLIC void	milli_delay(int milli_sec);
 /*	 keyboard.c 	*/
 PUBLIC void	keyboard_init();
 PUBLIC void	keyboard_handler();
+PUBLIC void keyboard_read(TTY* tty);
 
 /*	tty.c		*/
 PUBLIC void	task_tty();
@@ -54,11 +67,16 @@ PUBLIC int	vsprintf(char *buf, const char *fmt, va_list args);
 
 /*	 proc.c 		*/
 PUBLIC int	sys_get_ticks();
-PUBLIC int	sys_write(char* buf, int len, PROCESS* proc);
+PUBLIC int	sys_write(int _unused1, char* buf, int len, PROCESS* proc);
+PUBLIC int	sys_sendrec(int function, int src_des, MESSAGE* msg, PROCESS* proc);
+PUBLIC int	sys_printx(int _unused1, int _unused2, char* s, PROCESS* proc);
 PUBLIC void	schedule();
 
 /*	 syscall.asm 	*/
 PUBLIC int	get_ticks();
 PUBLIC void	write(char* buf, int len);
+
+/*	 systask.c 	*/
+PUBLIC void	task_sys();
 
 #endif

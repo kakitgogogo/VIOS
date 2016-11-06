@@ -28,7 +28,8 @@ OBJS			=	kernel/kernel.o kernel/start.o kernel/i8259.o \
 					lib/kliba.o lib/string.o kernel/main.o \
 					kernel/clock.o kernel/syscall.o kernel/proc.o \
 					kernel/keyborad.o kernel/tty.o kernel/console.o \
-					kernel/printf.o kernel/vsprintf.o
+					kernel/printf.o kernel/vsprintf.o kernel/systask.o \
+					kernel/panic.o lib/misc.o
 DASMOUTPUT		=	kernel.bin.asm
 
 # image
@@ -118,6 +119,12 @@ kernel/printf.o:	kernel/printf.c
 kernel/vsprintf.o: kernel/vsprintf.c
 	$(CC) $(CFLAGS) -o $@ $<
 
+kernel/systask.o: kernel/systask.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+kernel/panic.o: kernel/panic.c
+	$(CC) $(CFLAGS) -o $@ $<
+
 
 lib/klib.o: 		lib/klib.c
 		$(CC) $(CFLAGS) -o $@ $<
@@ -127,3 +134,6 @@ lib/kliba.o:		lib/kliba.asm
 
 lib/string.o:	lib/string.asm
 		$(ASM) $(ASMKFLAGS) -o $@ $<
+
+lib/misc.o:	lib/misc.c
+		$(CC) $(CFLAGS) -o $@ $<

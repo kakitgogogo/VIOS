@@ -565,7 +565,7 @@ ARDStruct16:
 	LengthHigh16:	dd	0
 	Type16:			dd	0
 
-MemBuf16:	times	256	db	0
+MemBuf16:	times	1024	db	0
 
 ; 32 bits
 Title				equ	BaseOfLoaderPhyAddr + Title16

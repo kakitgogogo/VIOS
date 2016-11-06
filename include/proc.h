@@ -28,6 +28,43 @@ typedef struct s_stackframe
 	u32	ss;
 }STACK_FRAME;
 
+struct msg1 
+{
+	int m1i1;
+	int m1i2;
+	int m1i3;
+	int m1i4;
+};
+struct msg2 
+{
+	void* m2p1;
+	void* m2p2;
+	void* m2p3;
+	void* m2p4;
+};
+struct msg3 
+{
+	int	m3i1;
+	int	m3i2;
+	int	m3i3;
+	int	m3i4;
+	u64	m3l1;
+	u64	m3l2;
+	void* m3p1;
+	void* m3p2;
+};
+typedef struct 
+{
+	int source;
+	int type;
+	union 
+	{
+		struct msg1 m1;
+		struct msg2 m2;
+		struct msg3 m3;
+	} u;
+} MESSAGE;
+
 typedef struct s_proc
 {
 	STACK_FRAME	regs;
@@ -40,25 +77,42 @@ typedef struct s_proc
 	u32			pid;
 	char		pname[16];
 
+	int			pflags;
+
+	MESSAGE*	pmsg;
+	int			recvfrom;
+	int			sendto;
+
+	bool		has_int_msg;
+
+	struct s_proc*	sending;
+	struct s_proc*	next_sending;
+
 	int			tty_id;
-}PROCESS;
+} PROCESS;
 
 typedef struct s_task
 {
 	task_f		initial_eip;
 	int			stacksize;
 	char		name[32];
-}TASK;
+} TASK;
 
-#define	NR_TASKS		1
+#define	proc2pid(x)	(x - proc_table)
+
+#define	NR_TASKS		2
 #define	NR_PROCS		3
+#define	FIRST_PROC	proc_table[0]
+#define	LAST_PROC	proc_table[NR_TASKS + NR_PROCS - 1]
 
 #define	STACK_SIZE_TTY		0x8000
+#define	STACK_SIZE_SYS		0x8000
 #define	STACK_SIZE_TESTA		0x8000
 #define	STACK_SIZE_TESTB		0x8000
 #define	STACK_SIZE_TESTC		0x8000
 
 #define	STACK_SIZE_TOTAL		(STACK_SIZE_TTY + \
+							STACK_SIZE_SYS + \
 							STACK_SIZE_TESTA + \
 							STACK_SIZE_TESTB + \
 							STACK_SIZE_TESTC)
