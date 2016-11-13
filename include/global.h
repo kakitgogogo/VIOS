@@ -34,4 +34,8 @@ extern	system_call	sys_call_table[NR_SYS_CALL];
 extern	TTY			tty_table[NR_CONSOLES];
 extern	CONSOLE		console_table[NR_CONSOLES];
 
+extern	u8*			fsbuf;
+extern	const int	FSBUF_SIZE;
+extern	DRIVER		dd_map[];
+
 #endif

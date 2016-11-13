@@ -19,6 +19,10 @@ void assertion_failure(char *exp, char *file, char *base_file, int line);
 #define	assert(exp)
 #endif
 
+/* Macro max and min */
+#define	max(a, b)	((a) > (b) ? (a) : (b))
+#define	min(a, b)	((a) < (b) ? (a) : (b))
+
 /* EXTERN */
 #define	EXTERN	extern
 
@@ -68,7 +72,7 @@ typedef enum
 #define	TIMER_MODE		0x43
 #define	RATE_GENERATOR	0x34
 #define	TIMER_FREQ		1193182L
-#define	HZ				100
+#define	HZ				1000
 
 /* 8042 */
 #define	KB_DATA			0x60
@@ -103,7 +107,7 @@ typedef enum
 #define	NR_CONSOLES		3
 
 /* System Call */
-#define	NR_SYS_CALL		4
+#define	NR_SYS_CALL		5
 
 /* String */
 #define	STR_DEFAULT_LEN	1024
@@ -117,7 +121,7 @@ typedef enum
 #define	INTERRUPT		-10
 #define	TASK_TTY			0
 #define	TASK_SYS			1
-#define	TASK_WINCH		2
+#define	TASK_HD			2
 #define	TASK_FS			3
 #define	TASK_MM			4
 #define	ANY				(NR_TASKS + NR_PROCS + 10)
@@ -137,8 +141,100 @@ enum msgtype
 {
 	HARD_INT = 1,
 	GET_TICKS,
+
+	DEV_OPEN = 1001,
+	DEV_CLOSE,
+	DEV_READ,
+	DEV_WRITE,
+	DEV_IOCTL
 };
 
-#define	RETVAL			u.m3.m3i1
+/* Macro for Message */
+#define	FD			u.m3.m3i1
+#define	PATHNAME	u.m3.m3p1 
+#define	FLAGS		u.m3.m3i1 
+#define	NAME_LEN		u.m3.m3i2 
+#define	CNT			u.m3.m3i2
+#define	REQUEST		u.m3.m3i2
+#define	PROC_ID		u.m3.m3i3
+#define	DEVICE		u.m3.m3i4
+#define	POSITION	u.m3.m3l1
+#define	BUF			u.m3.m3p2
+#define	OFFSET		u.m3.m3i2 
+#define	WHENCE		u.m3.m3i3 
+
+#define	PID			u.m3.m3i2 
+#define	STATUS		u.m3.m3i1 
+#define	RETVAL		u.m3.m3i1
+
+
+#define	DIOCTL_GET_GEO		1
+
+/* Hard Driver */
+#define	SECTOR_SIZE			512
+#define	SECTOR_BITS			(SECTOR_SIZE * 8)
+#define	SECTOR_SIZE_SHIFT	9
+
+/* Major Device numbers */
+#define	NO_DEV				0
+#define	DEV_FLOPPY			1
+#define	DEV_CDROM			2
+#define	DEV_HD				3
+#define	DEV_CHAR_TTY			4
+#define	DEV_SCSI				5
+
+/* About Device Major and Minor Number  */
+#define	MAJOR_SHIFT			8
+#define	MAKE_DEV(a, b)		((a << MAJOR_SHIFT) | b)
+#define	MAJOR(x)				((x >> MAJOR_SHIFT) & 0xFF)
+#define	MINOR(x)				(x & 0xFF)
+
+/* Device Number of Hard disk */
+#define	MINOR_HD1A			0x10
+#define	MINOR_HD2A			0x20
+#define	MINOR_HD2B			0x21
+#define	MINOR_HD3A			0x30
+#define	MINOR_HD4A			0x40
+
+#define	ROOT_DEV				MAKE_DEV(DEV_HD, MINOR_BOOT)
+
+#define	INVALID_INODE		0
+#define	ROOT_INODE			1
+
+#define	MAX_DRIVERS			2
+#define	NR_PART_PER_DRIVER	4
+#define	NR_SUB_PER_PART		16
+#define	NR_SUB_PER_DRIVER	(NR_SUB_PER_PART * NR_PART_PER_DRIVER)
+#define	NR_PRIM_PER_DRIVER	(NR_PART_PER_DRIVER + 1)
+
+/*  */
+#define	MAX_PRIM				(MAX_DRIVERS * NR_PRIM_PER_DRIVER - 1)
+
+#define	MAX_SUBPARTITONS		(NR_SUB_PER_DRIVER * MAX_DRIVERS)
+
+#define	P_PRIMARY			0
+#define	P_EXTENDED			1
+
+#define	VIOS_PART			0x99
+#define	NO_PART				0x00
+#define	EXT_PART				0x05
+
+#define	NR_FILES				64
+#define	NR_FILE_DESC			64
+#define	NR_INODE				64
+#define	NR_SUPER_BLOCK		8
+
+/* INODE */
+#define	I_TYPE_MASK			0170000
+#define	I_REGULAR       		0100000
+#define	I_BLOCK_SPECIAL 		0060000
+#define	I_DIRECTORY    		0040000
+#define	I_CHAR_SPECIAL 		0020000
+#define	I_NAMED_PIPE			0010000
+
+#define	is_special(m) \
+	((((m) & I_TYPE_MASK) == I_BLOCK_SPECIAL) || (((m) & I_TYPE_MASK) == I_CHAR_SPECIAL))
+
+#define	NR_DEFAULT_FILE_SECTS	2048
 
 #endif

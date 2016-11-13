@@ -5,13 +5,14 @@
 #include "string.h"
 #include "tty.h"
 #include "console.h"
+#include "fs.h"
 #include "global.h"
 #include "proto.h"
 #include "keyboard.h"
 
 PUBLIC void spin(char *func_name)
 {
-	printf("\nspinning in %s ...\n", func_name);
+	printf("\nSpinning in %s ...\n", func_name);
 	while(1);
 }
 

@@ -5,6 +5,7 @@
 #include "string.h"
 #include "tty.h"
 #include "console.h"
+#include "fs.h"
 #include "global.h"
 #include "proto.h"
 #include "keyboard.h"
@@ -19,7 +20,7 @@ PUBLIC int kernel_main()
 	u16 selector_ldt = SELECTOR_LDT_FIRST;	
 
 	int i;
-	int tty_ids[NR_TASKS + NR_PROCS] = {0, 0, 1, 2, 2};
+	int tty_ids[NR_TASKS + NR_PROCS] = {0, 0, 0, 0, 1, 2, 2};
 	u8 privilege, rpl;
 	u32 eflags, prio;
 	for(i = 0; i < NR_TASKS + NR_PROCS; ++i)
@@ -107,7 +108,6 @@ PUBLIC int get_ticks()
 
 void testA()
 {
-	int i = 0;
 	while(1)
 	{
 		printf("<Ticks: %d>", get_ticks());
@@ -117,7 +117,6 @@ void testA()
 
 void testB()
 {
-	int i = 0;
 	while(1)
 	{
 		printf("B");
@@ -127,7 +126,6 @@ void testB()
 
 void testC()
 {
-	int i = 0;
 	while(1)
 	{
 		printf("C");

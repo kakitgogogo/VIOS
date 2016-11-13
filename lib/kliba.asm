@@ -11,6 +11,9 @@ global	enable_irq
 global	disable_irq
 global	enable_int
 global	disable_int
+global	port_read
+global	port_write
+global	glitter
 
 
 ;-------------------------------------------------------------------------------------
@@ -205,5 +208,89 @@ enable_int:
 ;-------------------------------------------------------------------------------------
 disable_int:
 	cli
+	ret
+;-------------------------------------------------------------------------------------
+
+
+;-------------------------------------------------------------------------------------
+; function port_read
+;-------------------------------------------------------------------------------------
+; void port_read(u16 port, void* buf, int n);
+;-------------------------------------------------------------------------------------
+port_read:
+	mov		edx, [esp + 4]
+	mov		edi, [esp + 8]
+	mov		ecx, [esp + 12]
+	shr		ecx, 1
+	cld
+	rep		insw
+	ret
+;-------------------------------------------------------------------------------------
+
+
+;-------------------------------------------------------------------------------------
+; function port_write
+;-------------------------------------------------------------------------------------
+; void port_write(u16 port, void* buf, int n);
+;-------------------------------------------------------------------------------------
+port_write:
+	mov		edx, [esp + 4]
+	mov		edi, [esp + 8]
+	mov		ecx, [esp + 12]
+	shr		ecx, 1
+	cld
+	rep		outsw
+	ret
+;-------------------------------------------------------------------------------------
+
+
+;-------------------------------------------------------------------------------------
+; function glitter
+;-------------------------------------------------------------------------------------
+; void glitter(int row, int col);
+;-------------------------------------------------------------------------------------
+glitter:
+	push	eax
+	push	ebx
+	push	edx
+
+	mov		eax, [.current_char]
+	inc		eax
+	cmp		eax, .strlen
+	je		.1
+	jmp		.2
+.1:
+	xor		eax, eax
+.2:
+	mov		[.current_char], eax
+	mov	byte dl, [eax + .glitter_str]
+
+	xor		eax, eax
+	mov		al, [esp + 16]
+	mov		bl, .line_width
+	mul		bl
+	mov		bx, [esp + 20]
+	add		ax, bx
+	shl		ax, 1
+	movzx	eax, ax
+
+	mov		[gs:eax], dl
+
+	inc		eax
+	mov	byte [gs:eax], 4
+
+	jmp		.end
+
+.current_char:	dd	0
+.glitter_str:	db	'-\|/'
+				db	'1234567890'
+				db	'abcdefghijklmnopqrstuvwxyz'
+				db	'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+.strlen			equ	$ - .glitter_str
+.line_width		equ	80
+.end:
+	pop		edx
+	pop		ebx
+	pop		eax
 	ret
 ;-------------------------------------------------------------------------------------

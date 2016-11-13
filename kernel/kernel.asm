@@ -125,10 +125,27 @@ csinit:
 ; macro hwint_slave (slave hardware interrupt)
 ;-------------------------------------------------------------------------------------
 %macro	hwint_slave		1
+	call	save
+
+	in		al, INT_S_CTLMASK
+	or		al, (1 << (%1 - 8))
+	out		INT_S_CTLMASK, al
+
+	mov		al, EOI
+	out		INT_M_CTL, al
+	nop
+	out		INT_S_CTL, al
+
+	sti
 	push	%1
-	call	spurious_irq
-	add		esp, 4
-	hlt
+	call	[irq_table + 4 * %1]
+	pop		ecx
+	cli
+
+	in		al, INT_S_CTLMASK
+	and		al, ~(1 << (%1 - 8))
+	out		INT_S_CTLMASK, al
+	ret
 %endmacro
 ;-------------------------------------------------------------------------------------
 
@@ -261,9 +278,9 @@ sys_call:
 	call	[sys_call_table + eax * 4]
 	add		esp, 4 * 4
 	
+	pop		esi
 	mov		[esi + EAXREG - P_STACKBASE], eax
 
-	pop		esi
 	cli
 
 	ret

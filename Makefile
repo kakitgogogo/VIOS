@@ -16,7 +16,7 @@ CC				=	gcc
 LD				=	ld
 ASMBFLAGS		=	-I boot/include/
 ASMKFLAGS		=	-I include/ -f elf
-CFLAGS			=	-I include/ -c -fno-builtin -m32
+CFLAGS			=	-I include/ -c -fno-builtin -m32 -Wall
 LDFLAGS			=	-s -Ttext $(ENTRYPOINT) -m elf_i386
 DASMFLAGS		=	-u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
 
@@ -29,7 +29,8 @@ OBJS			=	kernel/kernel.o kernel/start.o kernel/i8259.o \
 					kernel/clock.o kernel/syscall.o kernel/proc.o \
 					kernel/keyborad.o kernel/tty.o kernel/console.o \
 					kernel/printf.o kernel/vsprintf.o kernel/systask.o \
-					kernel/panic.o lib/misc.o
+					kernel/message.o kernel/panic.o lib/misc.o kernel/hd.o \
+					fs/main.o
 DASMOUTPUT		=	kernel.bin.asm
 
 # image
@@ -85,23 +86,22 @@ kernel/main.o: 	kernel/main.c include/type.h include/const.h \
 				include/proc.h
 		$(CC) $(CFLAGS) -o $@ $<
 
-kernel/clock.o:	kernel/clock.c
+kernel/clock.o: kernel/clock.c
 		$(CC) $(CFLAGS) -o $@ $<
 
 kernel/keyborad.o: kernel/keyboard.c
 		$(CC) $(CFLAGS) -o $@ $<
 
-kernel/tty.o:		kernel/tty.c
+kernel/tty.o: kernel/tty.c
 		$(CC) $(CFLAGS) -o $@ $<
 
-kernel/console.o:		kernel/console.c
+kernel/console.o: kernel/console.c
 		$(CC) $(CFLAGS) -o $@ $<
 
-kernel/i8259.o: 	kernel/i8259.c include/type.h include/const.h \
-				include/protect.h include/proto.h
+kernel/i8259.o: kernel/i8259.c
 		$(CC) $(CFLAGS) -o $@ $<
 
-kernel/global.o:	kernel/global.c
+kernel/global.o: kernel/global.c
 		$(CC) $(CFLAGS) -o $@ $<
 
 kernel/protect.o: kernel/protect.c
@@ -110,10 +110,10 @@ kernel/protect.o: kernel/protect.c
 kernel/syscall.o: kernel/syscall.asm include/sconst.inc
 		$(ASM) $(ASMKFLAGS) -o $@ $<
 
-kernel/proc.o:	kernel/proc.c
+kernel/proc.o: kernel/proc.c
 		$(CC) $(CFLAGS) -o $@ $<
 
-kernel/printf.o:	kernel/printf.c
+kernel/printf.o: kernel/printf.c
 	$(CC) $(CFLAGS) -o $@ $<
 
 kernel/vsprintf.o: kernel/vsprintf.c
@@ -125,15 +125,26 @@ kernel/systask.o: kernel/systask.c
 kernel/panic.o: kernel/panic.c
 	$(CC) $(CFLAGS) -o $@ $<
 
+kernel/message.o: kernel/message.c
+	$(CC) $(CFLAGS) -o $@ $<
 
-lib/klib.o: 		lib/klib.c
+kernel/hd.o: kernel/hd.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+
+lib/klib.o: lib/klib.c
 		$(CC) $(CFLAGS) -o $@ $<
 
-lib/kliba.o:		lib/kliba.asm
+lib/kliba.o: lib/kliba.asm
 		$(ASM) $(ASMKFLAGS) -o $@ $<
 
-lib/string.o:	lib/string.asm
+lib/string.o: lib/string.asm
 		$(ASM) $(ASMKFLAGS) -o $@ $<
 
-lib/misc.o:	lib/misc.c
+lib/misc.o: lib/misc.c
 		$(CC) $(CFLAGS) -o $@ $<
+
+
+fs/main.o: fs/main.c
+		$(CC) $(CFLAGS) -o $@ $<
+

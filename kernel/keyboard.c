@@ -5,6 +5,7 @@
 #include "string.h"
 #include "tty.h"
 #include "console.h"
+#include "fs.h"
 #include "global.h"
 #include "proto.h"
 #include "keyboard.h"
@@ -157,7 +158,7 @@ PUBLIC void keyboard_read(TTY* tty)
 				{
 					if(get_byte_from_kbuf() == 0x37)
 					{
-						key == PRINTSCREEN;
+						key = PRINTSCREEN;
 						make = TRUE;
 					}
 				}

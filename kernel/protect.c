@@ -5,6 +5,7 @@
 #include "string.h"
 #include "tty.h"
 #include "console.h"
+#include "fs.h"
 #include "global.h"
 #include "proto.h"
 
@@ -53,7 +54,7 @@ PRIVATE void init_descriptor(DESCRIPTOR *desc, u32 base, u32 limit, u16 attribut
 	desc->base_low		= base & 0xFFFF;
 	desc->base_mid		= (base >> 16) & 0x0FF;
 	desc->attr1			= attribute & 0xFF;
-	desc->limit_high_attr2	= ((limit>>16) & 0x0F) | (attribute>>8) & 0xF0;
+	desc->limit_high_attr2	= ((limit>>16) & 0x0F) | ((attribute>>8) & 0xF0);
 	desc->base_high		= (base >> 24) & 0x0FF;
 }
 
@@ -184,7 +185,7 @@ PUBLIC void exception_handler(int vec_no, int err_code, int eip, int cs, int efl
 	disp_color_str(err_msg[vec_no], text_color);
 	disp_color_str("\n\n", text_color);
 	disp_color_str("EFLAGS:", text_color);
-	disp_color_int(eflags, text_color);
+	disp_color_int((int)eflags, text_color);
 	disp_color_str(" CS:", text_color);
 	disp_color_int(cs, text_color);
 	disp_color_str(" EIP:", text_color);

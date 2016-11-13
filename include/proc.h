@@ -100,19 +100,23 @@ typedef struct s_task
 
 #define	proc2pid(x)	(x - proc_table)
 
-#define	NR_TASKS		2
+#define	NR_TASKS		4
 #define	NR_PROCS		3
 #define	FIRST_PROC	proc_table[0]
 #define	LAST_PROC	proc_table[NR_TASKS + NR_PROCS - 1]
 
 #define	STACK_SIZE_TTY		0x8000
 #define	STACK_SIZE_SYS		0x8000
+#define	STACK_SIZE_HD		0x8000
+#define	STACK_SIZE_FS		0x8000
 #define	STACK_SIZE_TESTA		0x8000
 #define	STACK_SIZE_TESTB		0x8000
 #define	STACK_SIZE_TESTC		0x8000
 
 #define	STACK_SIZE_TOTAL		(STACK_SIZE_TTY + \
 							STACK_SIZE_SYS + \
+							STACK_SIZE_HD + \
+							STACK_SIZE_FS + \
 							STACK_SIZE_TESTA + \
 							STACK_SIZE_TESTB + \
 							STACK_SIZE_TESTC)
