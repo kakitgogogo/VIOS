@@ -26,10 +26,19 @@ PUBLIC char*	strcpy(char* dst, char* src);
 PUBLIC int	strlen(char* str);
 
 /* lib/misc.c */
-PUBLIC void spin(char *func_name);
-PUBLIC void assertion_failure(char *exp, char *file, char *base_file, int line);
+PUBLIC void	spin(char *func_name);
+PUBLIC void	assertion_failure(char *exp, char *file, char *base_file, int line);
+PUBLIC int	memcmp(const void* s1, const void *s2, int n);;
+PUBLIC int	strcmp(const char* s1, const char* s2);
+PUBLIC char*	strcat(char *s1, const char *s2);
 
-/*	 protect.c 	*/
+/* lib/open.c */
+PUBLIC int	open(const char* pathname, int flags);
+
+/* lib/close.c */
+PUBLIC int	close(int fd);
+
+/* kernel/protect.c */
 PUBLIC void	protect_init();
 PUBLIC u32	seg2phys(u16 selector);
 
@@ -89,7 +98,7 @@ PUBLIC void	dump_msg(const char * title, MESSAGE* msg);
 
 /* kernel/syscall.asm */
 PUBLIC int	get_ticks();
-PUBLIC void	write(char* buf, int len);
+PUBLIC void	write0(char* buf, int len);
 
 /* kernel/systask.c */
 PUBLIC void	task_sys();
@@ -102,6 +111,15 @@ PUBLIC void	task_hd();
 PUBLIC void	hd_handler(int irq);
 
 /* fs/main.c */
-PUBLIC void task_fs();
+PUBLIC int	rw_sector(int io_type, int dev, u64 pos, int bytes, int proc_id, void* buf);
+PUBLIC void	task_fs();
+
+/* fs/open.c */
+PUBLIC int	do_open();
+PUBLIC int	do_close();
+
+/* fs/misc.c */
+PUBLIC int	strip_path(char* filename, const char* pathname, inode** inode_ptr_ptr);
+PUBLIC int	search_file(char* path);
 
 #endif

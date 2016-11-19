@@ -89,6 +89,8 @@ typedef struct s_proc
 	struct s_proc*	next_sending;
 
 	int			tty_id;
+
+	file_desc*	files[NR_FILES];
 } PROCESS;
 
 typedef struct s_task

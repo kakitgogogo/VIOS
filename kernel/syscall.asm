@@ -7,7 +7,7 @@ SENDREC_ID		equ	3
 INT_VECTOR_SYS_CALL	equ	0x90
 
 global	get_ticks0
-global	write
+global	write0
 global	printx
 global	sendrec
 
@@ -19,18 +19,18 @@ bits 32
 ;-------------------------------------------------------------------------------------
 ; void get_ticks0()
 ;-------------------------------------------------------------------------------------
-get_ticks:
+get_ticks0:
 	mov		eax, GET_TICKS_ID
 	int		INT_VECTOR_SYS_CALL
 	ret
 ;-------------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------------
-; system call write
+; system call write0
 ;-------------------------------------------------------------------------------------
-; void write(char* buf, int len);
+; void write0(char* buf, int len);
 ;-------------------------------------------------------------------------------------
-write:
+write0:
 	mov		eax, WRITE_ID
 	mov		ecx, [esp + 4]
 	mov		edx, [esp + 8]

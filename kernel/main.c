@@ -1,14 +1,15 @@
 #include "const.h"
 #include "type.h"
 #include "protect.h"
-#include "proc.h"
 #include "string.h"
 #include "tty.h"
 #include "console.h"
 #include "fs.h"
+#include "proc.h"
 #include "global.h"
 #include "proto.h"
 #include "keyboard.h"
+#include "stdio.h"
 
 PUBLIC int kernel_main()
 {
@@ -19,8 +20,8 @@ PUBLIC int kernel_main()
 	char* stack_top = task_stack + STACK_SIZE_TOTAL;
 	u16 selector_ldt = SELECTOR_LDT_FIRST;	
 
-	int i;
-	int tty_ids[NR_TASKS + NR_PROCS] = {0, 0, 0, 0, 1, 2, 2};
+	int i, j;
+	int tty_ids[NR_TASKS + NR_PROCS] = {0, 0, 0, 0, 1, 2, 0};
 	u8 privilege, rpl;
 	u32 eflags, prio;
 	for(i = 0; i < NR_TASKS + NR_PROCS; ++i)
@@ -76,6 +77,11 @@ PUBLIC int kernel_main()
 
 		proc->tty_id = tty_ids[i];
 
+		for(j = 0; j < NR_FILES; ++j)
+		{
+			proc->files[j] = 0;
+		}
+
 		stack_top -= task->stacksize;	
 		++proc;
 		++task;
@@ -126,9 +132,34 @@ void testB()
 
 void testC()
 {
-	while(1)
-	{
-		printf("C");
-		milli_delay(200);
-	}
+	int fd;
+	int n;
+	const char filename[] = "kakit";
+	const char bufw[] = "i am kakit";
+	const int rd_bytes = 10;
+	char bufr[rd_bytes];
+
+	assert(rd_bytes <= strlen(bufw));
+
+	fd = open(filename, O_CREAT | O_RDWR);
+	assert(fd != -1);
+	printf("File created. fd: %d\n", fd);
+
+	n = write(fd, bufw, strlen(bufw));
+	assert(n == strlen(bufw));
+
+	close(fd);
+
+	fd = open(filename, O_RDWR);
+	assert(fd != -1);
+	printf("File opened. fd: %d\n", fd);
+
+	n = read(fd, bufr, rd_bytes);
+	assert(n == rd_bytes);
+	bufr[n] = 0;
+	printf("%d bytes read: %s\n", n, bufr);
+
+	close(fd);
+
+	spin("Test C");
 }

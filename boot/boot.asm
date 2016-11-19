@@ -1,4 +1,4 @@
-	org	07c00h
+	org		07c00h
 
 	jmp short start
 	nop

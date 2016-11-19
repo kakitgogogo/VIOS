@@ -1,11 +1,11 @@
 #include "const.h"
 #include "type.h"
 #include "protect.h"
-#include "proc.h"
 #include "string.h"
 #include "tty.h"
 #include "console.h"
 #include "fs.h"
+#include "proc.h"
 #include "global.h"
 #include "proto.h"
 
@@ -248,7 +248,6 @@ PUBLIC int sys_sendrec(int function, int src_des, MESSAGE* msg, PROCESS* proc)
 {
 	assert(k_reenter == 0);
 
-	//printf("function = %d; src_des = %d; ANY = %d\n", function, src_des, ANY);
 	assert((src_des >= 0 && src_des < NR_TASKS + NR_PROCS) || src_des == ANY || src_des == INTERRUPT);
 	
 	int ret = 0;

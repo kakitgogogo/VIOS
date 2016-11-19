@@ -34,8 +34,15 @@ extern	system_call	sys_call_table[NR_SYS_CALL];
 extern	TTY			tty_table[NR_CONSOLES];
 extern	CONSOLE		console_table[NR_CONSOLES];
 
+/* File System */
+EXTERN	file_desc	fd_table[NR_FILE_DESC];
+EXTERN	inode		inode_table[NR_INODE];
+EXTERN	super_block	sb_table[NR_SUPER_BLOCK];
 extern	u8*			fsbuf;
 extern	const int	FSBUF_SIZE;
+EXTERN	MESSAGE		fs_msg;
+EXTERN	PROCESS*	fs_caller;
+EXTERN	inode*		root_inode;
 extern	DRIVER		dd_map[];
 
 #endif

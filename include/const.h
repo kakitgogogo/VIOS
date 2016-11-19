@@ -19,6 +19,16 @@ void assertion_failure(char *exp, char *file, char *base_file, int line);
 #define	assert(exp)
 #endif
 
+/* Macro about Break Point */
+#define	BREAK_POINT	\
+	do\
+	{\
+		printf("\n===Break Point %d===\n", __LINE__);\
+		spin("break point");\
+		__asm__ __volatile__("hlt");\
+	}\
+	while(0)
+
 /* Macro max and min */
 #define	max(a, b)	((a) > (b) ? (a) : (b))
 #define	min(a, b)	((a) < (b) ? (a) : (b))
@@ -140,7 +150,18 @@ typedef enum
 enum msgtype
 {
 	HARD_INT = 1,
+
 	GET_TICKS,
+
+	OPEN,
+	CLOSE,
+	READ,
+	WRITE,
+	LSEEK,
+	STAT,
+	UNLINK,
+
+	SYSCALL_RET,
 
 	DEV_OPEN = 1001,
 	DEV_CLOSE,
@@ -166,6 +187,7 @@ enum msgtype
 #define	PID			u.m3.m3i2 
 #define	STATUS		u.m3.m3i1 
 #define	RETVAL		u.m3.m3i1
+#define	STATUS		u.m3.m3i1
 
 
 #define	DIOCTL_GET_GEO		1

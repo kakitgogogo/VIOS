@@ -235,7 +235,7 @@ port_read:
 ;-------------------------------------------------------------------------------------
 port_write:
 	mov		edx, [esp + 4]
-	mov		edi, [esp + 8]
+	mov		esi, [esp + 8]
 	mov		ecx, [esp + 12]
 	shr		ecx, 1
 	cld

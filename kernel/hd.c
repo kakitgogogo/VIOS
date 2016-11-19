@@ -1,12 +1,12 @@
 #include "const.h"
 #include "type.h"
 #include "protect.h"
-#include "proc.h"
 #include "string.h"
 #include "tty.h"
 #include "console.h"
 #include "hd.h"
 #include "fs.h"
+#include "proc.h"
 #include "global.h"
 #include "proto.h"
 
@@ -50,6 +50,7 @@ PRIVATE void hd_cmd_out(hd_cmd* cmd)
 	out_byte(REG_LBA_MID, cmd->lba_mid);
 	out_byte(REG_LBA_HIGH, cmd->lba_high);
 	out_byte(REG_DEVICE, cmd->device);
+
 	out_byte(REG_CMD, cmd->command);
 }
 
@@ -109,6 +110,8 @@ PRIVATE void partition(int device, int style)
 		int ext_start_sect = hdi->primary[j].base;
 		int s = ext_start_sect;
 		int nr_1st_sub = (j - 1) * NR_SUB_PER_PART;
+
+		//printf("nr_1st_sub: %d\n", nr_1st_sub);
 
 		for(i = 0; i < NR_SUB_PER_PART; ++i)
 		{
@@ -270,17 +273,21 @@ PRIVATE void hd_rdwt(MESSAGE *msg)
 		hd_infos[driver].logical[logicalIdx].base;
 
 	hd_cmd cmd;
-	cmd.features = 0;
-	cmd.count = (msg->CNT + SECTOR_SIZE - 1) / SECTOR_SIZE;
-	cmd.lba_low = sect_id & 0xFF;
-	cmd.lba_mid = (sect_id >> 8) & 0xFF;
-	cmd.lba_high = (sect_id >> 16) & 0xFF;
-	cmd.device = MAKE_DEVICE_REG(1, driver, (sect_id >> 24) & 0xF);
-	cmd.command = (msg->type == DEV_READ) ? ATA_READ : ATA_WRITE;
+	cmd.features	= 0;
+	cmd.count	= (msg->CNT + SECTOR_SIZE - 1) / SECTOR_SIZE;
+	cmd.lba_low	= sect_id & 0xFF;
+	cmd.lba_mid	= (sect_id >> 8) & 0xFF;
+	cmd.lba_high	= (sect_id >> 16) & 0xFF;
+	cmd.device	= MAKE_DEVICE_REG(1, driver, (sect_id >> 24) & 0xF);
+	cmd.command	= (msg->type == DEV_READ) ? ATA_READ : ATA_WRITE;
 	hd_cmd_out(&cmd);
 
+	//printf("%d 0x%xla: " , msg->PROC_ID, msg->BUF);
+
 	int bytes_left = msg->CNT;
-	void *la = (void*)va2la(msg->PROC_ID, msg->BUF);
+	void* la = (void*)va2la(msg->PROC_ID, msg->BUF);
+
+	//printf("0x%x\n", la);
 
 	while(bytes_left)
 	{
@@ -303,19 +310,20 @@ PRIVATE void hd_rdwt(MESSAGE *msg)
 		bytes_left -= SECTOR_SIZE;
 		la += SECTOR_SIZE;
 	}
+
 }
 
-PRIVATE void hd_ioctl(MESSAGE *msg)
+PRIVATE void hd_ioctl(MESSAGE* msg)
 {
 	int device = msg->DEVICE;
 	int driver = DRV_OF_DEV(device);
 
-	hd_info *hdi = &hd_infos[driver];
+	hd_info* hdi = &hd_infos[driver];
 
 	if(msg->REQUEST == DIOCTL_GET_GEO)
 	{
-		void *dst = va2la(msg->PROC_ID, msg->BUF);
-		void *src = va2la(TASK_HD,
+		void* dst = va2la(msg->PROC_ID, msg->BUF);
+		void* src = va2la(TASK_HD,
 					device < MAX_PRIM?
 					&hdi->primary[device]:
 					&hdi->logical[(device - MINOR_HD1A) % NR_SUB_PER_DRIVER]);
@@ -355,7 +363,7 @@ PUBLIC void task_hd()
 			hd_ioctl(&msg);
 			break;
 		default:
-			dump_msg("HD Driver::unknown msg",&msg);
+			dump_msg("HD Driver::unknown msg: ",&msg);
 			spin("File System (invalid msg.type)");
 			break;
 		}
@@ -363,7 +371,6 @@ PUBLIC void task_hd()
 		send_recv(SEND, src, &msg);
 	}
 }
-
 
 PUBLIC void hd_handler(int irq)
 {

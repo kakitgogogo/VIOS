@@ -1,11 +1,11 @@
 #include "const.h"
 #include "type.h"
 #include "protect.h"
-#include "proc.h"
 #include "string.h"
 #include "tty.h"
 #include "console.h"
 #include "fs.h"
+#include "proc.h"
 #include "global.h"
 #include "proto.h"
 #include "keyboard.h"
@@ -144,4 +144,17 @@ PUBLIC void select_console(int console_id)
 
 	set_cursor(console_table[console_id].cursor);
 	set_video_start_addr(console_table[console_id].current_start_addr);
+}
+
+PUBLIC void clear_console()
+{
+	CONSOLE *console = &console_table[current_console_id];
+
+	console->cursor = 0;
+	for(; console->cursor < console->original_addr + console->v_mem_limit - 1; )
+	{
+		out_char(console, ' ');
+	}
+
+	screen_init(&tty_table[current_console_id]);
 }

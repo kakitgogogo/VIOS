@@ -64,24 +64,24 @@ typedef struct dir_entry
 typedef struct file_desc
 {
 	int	fd_mode;
-	int	df_pos;
-	inode fd_inode;
+	int	fd_pos;
+	inode* fd_inode;
 }file_desc;
 
 
 /* Macro about Sector Read and Write */
 #define RD_SECT(dev, sect_id) rw_sector(DEV_READ, \
-				       dev, \
-				       (sect_id) * SECTOR_SIZE, \
-				       SECTOR_SIZE, \
-				       TASK_FS, \
-				       fsbuf);
+							dev, \
+							(sect_id) * SECTOR_SIZE, \
+							SECTOR_SIZE, \
+							TASK_FS, \
+							fsbuf);
 
 #define WR_SECT(dev, sect_id) rw_sector(DEV_WRITE, \
-				       dev, \
-				       (sect_id) * SECTOR_SIZE, \
-				       SECTOR_SIZE, \
-				       TASK_FS, \
-				       fsbuf);
+							dev, \
+							(sect_id) * SECTOR_SIZE, \
+							SECTOR_SIZE, \
+							TASK_FS, \
+							fsbuf);
 
 #endif

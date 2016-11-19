@@ -1,11 +1,11 @@
 #include "const.h"
 #include "type.h"
 #include "protect.h"
-#include "proc.h"
 #include "string.h"
 #include "tty.h"
 #include "console.h"
 #include "fs.h"
+#include "proc.h"
 #include "global.h"
 #include "proto.h"
 
@@ -174,8 +174,8 @@ PUBLIC void exception_handler(int vec_no, int err_code, int eip, int cs, int efl
 					"#XF SIMD Floating-Point Exception"
 					};
 
-	disp_pos = 0;
-	for(i = 0; i < 80*3; ++i)
+	disp_pos = 0; 
+	for(i = 0; i < 80 * 3; ++i)
 	{
 		disp_color_str(" ", text_color);
 	}

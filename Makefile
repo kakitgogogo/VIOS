@@ -17,20 +17,21 @@ LD				=	ld
 ASMBFLAGS		=	-I boot/include/
 ASMKFLAGS		=	-I include/ -f elf
 CFLAGS			=	-I include/ -c -fno-builtin -m32 -Wall
-LDFLAGS			=	-s -Ttext $(ENTRYPOINT) -m elf_i386
+LDFLAGS			=	-s -Ttext $(ENTRYPOINT) -m elf_i386 -Map kernal.map
 DASMFLAGS		=	-u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
 
 # Object
 VIOSBOOT		=	boot/boot.bin boot/loader.bin
 VIOSKERNEL		=	kernel.bin
 OBJS			=	kernel/kernel.o kernel/start.o kernel/i8259.o \
-					kernel/global.o kernel/protect.o lib/klib.o \
-					lib/kliba.o lib/string.o kernel/main.o \
+					kernel/global.o kernel/protect.o kernel/main.o \
 					kernel/clock.o kernel/syscall.o kernel/proc.o \
 					kernel/keyborad.o kernel/tty.o kernel/console.o \
 					kernel/printf.o kernel/vsprintf.o kernel/systask.o \
-					kernel/message.o kernel/panic.o lib/misc.o kernel/hd.o \
-					fs/main.o
+					kernel/message.o kernel/panic.o kernel/hd.o \
+					lib/misc.o lib/klib.o lib/kliba.o lib/string.o \
+					lib/open.o lib/close.o lib/read.o lib/write.o\
+					fs/main.o fs/misc.o fs/open.o fs/read_write.o
 DASMOUTPUT		=	kernel.bin.asm
 
 # image
@@ -76,14 +77,10 @@ kernel/kernel.o:	kernel/kernel.asm include/sconst.inc
 $(VIOSKERNEL):	$(OBJS)
 		$(LD) $(LDFLAGS) -o $(VIOSKERNEL) $(OBJS)
 
-kernel/start.o:	kernel/start.c include/type.h include/const.h \
-				include/protect.h include/proto.h include/string.h \
-				include/proc.h
+kernel/start.o:	kernel/start.c
 		$(CC) $(CFLAGS) -o $@ $<
 
-kernel/main.o: 	kernel/main.c include/type.h include/const.h \
-				include/protect.h include/proto.h include/string.h \
-				include/proc.h
+kernel/main.o: 	kernel/main.c
 		$(CC) $(CFLAGS) -o $@ $<
 
 kernel/clock.o: kernel/clock.c
@@ -107,7 +104,7 @@ kernel/global.o: kernel/global.c
 kernel/protect.o: kernel/protect.c
 		$(CC) $(CFLAGS) -o $@ $<
 
-kernel/syscall.o: kernel/syscall.asm include/sconst.inc
+kernel/syscall.o: kernel/syscall.asm
 		$(ASM) $(ASMKFLAGS) -o $@ $<
 
 kernel/proc.o: kernel/proc.c
@@ -144,7 +141,26 @@ lib/string.o: lib/string.asm
 lib/misc.o: lib/misc.c
 		$(CC) $(CFLAGS) -o $@ $<
 
+lib/open.o: lib/open.c
+		$(CC) $(CFLAGS) -o $@ $<
+
+lib/close.o: lib/close.c
+		$(CC) $(CFLAGS) -o $@ $<
+
+lib/read.o: lib/read.c
+		$(CC) $(CFLAGS) -o $@ $<
+
+lib/write.o: lib/write.c
+		$(CC) $(CFLAGS) -o $@ $<
 
 fs/main.o: fs/main.c
 		$(CC) $(CFLAGS) -o $@ $<
 
+fs/open.o: fs/open.c
+		$(CC) $(CFLAGS) -o $@ $<
+
+fs/misc.o: fs/misc.c
+		$(CC) $(CFLAGS) -o $@ $<
+
+fs/read_write.o: fs/read_write.c
+		$(CC) $(CFLAGS) -o $@ $<
