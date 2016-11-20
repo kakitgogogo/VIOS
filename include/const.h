@@ -152,6 +152,7 @@ enum msgtype
 	HARD_INT = 1,
 
 	GET_TICKS,
+	GET_PID,
 
 	OPEN,
 	CLOSE,
@@ -167,7 +168,9 @@ enum msgtype
 	DEV_CLOSE,
 	DEV_READ,
 	DEV_WRITE,
-	DEV_IOCTL
+	DEV_IOCTL,
+
+	DISK_LOG
 };
 
 /* Macro for Message */

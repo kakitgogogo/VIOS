@@ -31,7 +31,9 @@ OBJS			=	kernel/kernel.o kernel/start.o kernel/i8259.o \
 					kernel/message.o kernel/panic.o kernel/hd.o \
 					lib/misc.o lib/klib.o lib/kliba.o lib/string.o \
 					lib/open.o lib/close.o lib/read.o lib/write.o\
-					fs/main.o fs/misc.o fs/open.o fs/read_write.o
+					lib/getpid.o lib/unlink.o\
+					fs/main.o fs/misc.o fs/open.o fs/read_write.o \
+					fs/link.o
 DASMOUTPUT		=	kernel.bin.asm
 
 # image
@@ -62,19 +64,17 @@ building:
 		sudo cp -fv boot/loader.bin $(MOUNTPOINT)
 		sudo cp -fv kernel.bin $(MOUNTPOINT)
 
-boot/boot.bin: 	boot/boot.asm boot/include/load.inc \
-				boot/include/fat12.inc boot/include/func.inc 
+boot/boot.bin:  boot/boot.asm
 		$(ASM) $(ASMBFLAGS) -o $@ $<
 
-boot/loader.bin: 	boot/loader.asm boot/include/load.inc \
-				boot/include/fat12.inc boot/include/pm.inc \
-				boot/include/func.inc 
+boot/loader.bin: boot/loader.asm
 		$(ASM) $(ASMBFLAGS) -o $@ $<
 
-kernel/kernel.o:	kernel/kernel.asm include/sconst.inc
+
+kernel/kernel.o: kernel/kernel.asm
 		$(ASM) $(ASMKFLAGS) -o $@ $<
 
-$(VIOSKERNEL):	$(OBJS)
+$(VIOSKERNEL): $(OBJS)
 		$(LD) $(LDFLAGS) -o $(VIOSKERNEL) $(OBJS)
 
 kernel/start.o:	kernel/start.c
@@ -153,6 +153,13 @@ lib/read.o: lib/read.c
 lib/write.o: lib/write.c
 		$(CC) $(CFLAGS) -o $@ $<
 
+lib/getpid.o: lib/getpid.c
+		$(CC) $(CFLAGS) -o $@ $<
+
+lib/unlink.o: lib/unlink.c
+		$(CC) $(CFLAGS) -o $@ $<
+
+
 fs/main.o: fs/main.c
 		$(CC) $(CFLAGS) -o $@ $<
 
@@ -164,3 +171,6 @@ fs/misc.o: fs/misc.c
 
 fs/read_write.o: fs/read_write.c
 		$(CC) $(CFLAGS) -o $@ $<
+
+fs/link.o: fs/link.c
+			$(CC) $(CFLAGS) -o $@ $<
