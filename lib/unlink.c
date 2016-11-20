@@ -18,6 +18,7 @@ PUBLIC int unlink(const char* pathname)
 	msg.type = UNLINK;
 
 	msg.PATHNAME = (void*)(pathname);
+	msg.NAME_LEN = strlen(pathname);
 
 	send_recv(BOTH, TASK_FS, &msg);
 

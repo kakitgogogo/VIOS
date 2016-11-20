@@ -23,7 +23,7 @@ PUBLIC int do_unlink()
 	memcpy((void*)va2la(TASK_FS, pathname), (void*)va2la(src, fs_msg.PATHNAME), name_len);
 	pathname[name_len] = 0;
 
-	if(strcmp(pathname, "/" == 0))
+	if(strcmp(pathname, "/") == 0)
 	{
 		printf("FS: do_unlink() : cannot unlink the root\n");
 		return -1;
@@ -68,7 +68,7 @@ PUBLIC int do_unlink()
 	RD_SECT(inode_ptr->i_dev, 2);
 	assert(fsbuf[byte_idx % SECTOR_SIZE] & (1 << bit_idx));
 	fsbuf[byte_idx % SECTOR_SIZE] &= ~(1 << bit_idx);
-	WR_SECT(inode_ptr, 2);
+	WR_SECT(inode_ptr->i_dev, 2);
 
 	/* free the bits in s-map */
 	bit_idx = inode_ptr->i_start_sect - sb->first_sect + 1;
@@ -83,7 +83,7 @@ PUBLIC int do_unlink()
 	for(i = bit_idx % 8; (i < 8) && bits_left; ++i, --bits_left)
 	{
 		assert((fsbuf[byte_idx % SECTOR_SIZE] >> i & 1) == 1);
-		fsbuf[byte_idx % SECTOR_SIZE] &= ~(i << i);
+		fsbuf[byte_idx % SECTOR_SIZE] &= ~(1 << i);
 	}
 
 	int k;
@@ -161,6 +161,5 @@ PUBLIC int do_unlink()
 		dir_inode->i_size = dir_size;
 		sync_inode(dir_inode);
 	}
-
 	return 0;
 }

@@ -133,7 +133,7 @@ void testB()
 void testC()
 {
 	int fd;
-	int n;
+	int i, n;
 	const char filename[] = "kakit";
 	const char bufw[] = "i am kakit";
 	const int rd_bytes = 10;
@@ -143,7 +143,7 @@ void testC()
 
 	fd = open(filename, O_CREAT | O_RDWR);
 	assert(fd != -1);
-	printf("File created. fd: %d\n", fd);
+	printf("File %s created(fd: %d)\n", filename, fd);
 
 	n = write(fd, bufw, strlen(bufw));
 	assert(n == strlen(bufw));
@@ -152,7 +152,7 @@ void testC()
 
 	fd = open(filename, O_RDWR);
 	assert(fd != -1);
-	printf("File opened. fd: %d\n", fd);
+	printf("File opened(fd: %d)\n", fd);
 
 	n = read(fd, bufr, rd_bytes);
 	assert(n == rd_bytes);
@@ -160,6 +160,29 @@ void testC()
 	printf("%d bytes read: %s\n", n, bufr);
 
 	close(fd);
+
+	char* filenames[] = {"/a", "/b", "/c"};
+
+	for(i = 0; i < 3; ++i)
+	{
+		fd = open(filenames[i], O_CREAT | O_RDWR);
+		assert(fd != -1);
+		printf("File %s created(fd: %d)\n", filenames[i], fd);
+		close(fd);
+	}
+
+	char* rfilenames[] = {"/c", "/a", "/b"};
+	for(i = 0; i < 3; ++i)
+	{
+		if(unlink(rfilenames[i]) == 0)
+		{
+			printf("File %s removed\n", rfilenames[i]);
+		}
+		else
+		{
+			printf("Failed to remove file %s\n", rfilenames[i]);
+		}
+	}
 
 	spin("Test C");
 }
