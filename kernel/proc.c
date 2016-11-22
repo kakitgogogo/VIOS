@@ -74,51 +74,14 @@ PUBLIC void* va2la(int pid, void* va)
 	return (void*)la;
 }
 
-PUBLIC int sys_printx(int _unused1, int _unused2, char* s, PROCESS* proc)
+PUBLIC void tty_write(TTY* tty, char* buf, int len)
 {
-	const char *p;
-	char ch;
+	char *p = buf;
+	int i = len;
 
-	char reenter_err[] = "? k_reenter is incorrect for unknown reason";
-	reenter_err[0] = MAG_CH_PANIC;
-
-	if(k_reenter == 0)
-		p = va2la(proc2pid(proc), s);
-	else if(k_reenter > 0)
-		p = s;
-	else
-		p = reenter_err;
-
-	if((*p == MAG_CH_PANIC) || (*p == MAG_CH_ASSERT && proc_ready < &proc_table[NR_TASKS]))
+	while(i)
 	{
-		disable_int();
-		char *v = (char*)V_MEM_BASE;
-		const char *q = p + 1;
-
-		while(v < (char*)(V_MEM_BASE + V_MEM_SIZE))
-		{
-			*v++ = *q++;
-			*v++ = RED_CHAR;
-			if(!*q)
-			{
-				while(((int)v - V_MEM_BASE) % (SCREEN_WIDTH * 8))
-				{
-					*v++ = ' ';
-					*v++ = RED_CHAR;
-				}
-				q = p + 1;
-			}
-		}
-		__asm__ __volatile__("hlt");
+		out_char(tty->console, *p++);
+		--i;
 	}
-
-	while((ch = *p++) != 0)
-	{
-		if(ch == MAG_CH_PANIC || ch == MAG_CH_ASSERT)
-			continue;
-
-		out_char(tty_table[proc->tty_id].console, ch);
-	}
-
-	return 0;
 }

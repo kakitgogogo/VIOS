@@ -97,7 +97,7 @@
 
 typedef struct s_kb {
 	char* head;			
-	char* rear;			
+	char* tail;			
 	int count;			
 	char buf[KB_IN_BYTES];	
 }KB_INPUT;

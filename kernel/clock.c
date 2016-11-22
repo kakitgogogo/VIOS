@@ -21,8 +21,20 @@ PUBLIC void clock_init()
 
 PUBLIC void clock_handler(int irq)
 {
-	++ticks;
-	--proc_ready->ticks;
+	if(++ticks >= MAX_TICKS)
+	{
+		ticks = 0;
+	}
+
+	if(proc_ready->ticks)
+	{
+		--proc_ready->ticks;
+	}
+
+	if(key_pressed)
+	{
+		inform_int(TASK_TTY);
+	}
 
 	if(k_reenter != 0)
 	{
@@ -35,14 +47,6 @@ PUBLIC void clock_handler(int irq)
 	}
 
 	schedule();
-	
-	/*
-	proc_ready++;
-	if(proc_ready >= proc_table + NR_TASKS)
-	{
-		proc_ready = proc_table;
-	}
-	*/
 }
 
 PUBLIC void milli_delay(int milli_sec)

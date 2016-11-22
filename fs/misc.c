@@ -48,7 +48,7 @@ PUBLIC int strip_path(char* filename, const char* pathname, inode** inode_ptr_pt
 	return 0;
 }
 
-PUBLIC int search_file(char* path)
+PUBLIC int search_file(char* pathname)
 {
 	int i, j;
 
@@ -56,7 +56,7 @@ PUBLIC int search_file(char* path)
 	memset(filename, 0, MAX_FILENAME_LEN);
 	inode* dir_inode;
 
-	if(strip_path(filename, path, &dir_inode) != 0)
+	if(strip_path(filename, pathname, &dir_inode) != 0)
 	{
 		return 0;
 	}

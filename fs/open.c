@@ -42,7 +42,7 @@ PRIVATE int alloc_imap_bit(int dev)
 		return inode_id;
 	}
 
-	panic("inode map is empty or full.\n");
+	panic("inode map is full.\n");
 
 	return 0;
 }
@@ -206,7 +206,7 @@ PUBLIC int do_open()
 	{
 		if(inode_id)
 		{
-			printf("File Exists.\n");
+			printk("File Exists.\n");
 			return -1;
 		}
 		else
@@ -266,7 +266,7 @@ PUBLIC int do_open()
 PUBLIC int do_close()
 {
 	int fd = fs_msg.FD;
-	put_inode(fs_caller->files[fd]->fd_inode);
+	dec_inode(fs_caller->files[fd]->fd_inode);
 	fs_caller->files[fd]->fd_inode = 0;
 	fs_caller->files[fd] = 0;
 

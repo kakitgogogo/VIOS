@@ -16,10 +16,12 @@ EXTERN	GATE 		idt[IDT_SIZE];
 
 EXTERN	u32			k_reenter;
 
+EXTERN	int			current_console_id;
+
+EXTERN	bool		key_pressed;
+
 EXTERN	TSS			tss;
 EXTERN	PROCESS*	proc_ready;
-
-EXTERN	int			current_console_id;
 
 extern	PROCESS		proc_table[NR_TASKS + NR_PROCS];
 extern	char		task_stack[STACK_SIZE_TOTAL];

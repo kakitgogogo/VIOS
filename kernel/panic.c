@@ -18,7 +18,7 @@ PUBLIC void panic(const char *fmt, ...)
 
 	i = vsprintf(buf, fmt, arg);
 
-	printf("%c !!panic!! %s", MAG_CH_PANIC, buf);
+	printk("%c !!panic!! %s", MAG_CH_PANIC, buf);
 
 	__asm__ __volatile__("ud2");
 }

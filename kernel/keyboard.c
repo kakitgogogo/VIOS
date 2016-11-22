@@ -62,7 +62,7 @@ PRIVATE void set_leds()
 
 PUBLIC void keyboard_init()
 {
-	kb_in.head = kb_in.rear = kb_in.buf;
+	kb_in.head = kb_in.tail = kb_in.buf;
 	kb_in.count = 0;
 
 	shift_l = shift_r = FALSE;
@@ -72,6 +72,8 @@ PUBLIC void keyboard_init()
 	caps_lock = FALSE;
 	num_lock = TRUE;
 	scroll_lock = FALSE;
+
+	column = 0;
 
 	set_leds();
 
@@ -93,6 +95,8 @@ PUBLIC void keyboard_handler()
 		}
 		++kb_in.count;
 	}
+
+	key_pressed = TRUE;
 }
 
 PRIVATE u8 get_byte_from_kbuf()
@@ -102,11 +106,11 @@ PRIVATE u8 get_byte_from_kbuf()
 	while(kb_in.count <= 0);
 
 	disable_int();
-	scan_code = *(kb_in.rear);
-	++kb_in.rear;
-	if(kb_in.rear == kb_in.buf + KB_IN_BYTES)
+	scan_code = *(kb_in.tail);
+	++kb_in.tail;
+	if(kb_in.tail == kb_in.buf + KB_IN_BYTES)
 	{
-		kb_in.rear = kb_in.buf;
+		kb_in.tail = kb_in.buf;
 	}
 	--kb_in.count;
 	enable_int();
@@ -118,7 +122,6 @@ PUBLIC void keyboard_read(TTY* tty)
 {
 
 	u8 scan_code;
-	char output[2];
 	bool make = FALSE;
 
 	u32 key = 0;
@@ -150,13 +153,16 @@ PUBLIC void keyboard_read(TTY* tty)
 		}
 		else if(scan_code == 0xE0)
 		{
+			code_with_E0 = TRUE;
 			scan_code = get_byte_from_kbuf();
 
 			if(scan_code == 0x2A)
 			{
-				if(get_byte_from_kbuf() == 0xE0)
+				code_with_E0 = FALSE;
+				if((scan_code = get_byte_from_kbuf()) == 0xE0)
 				{
-					if(get_byte_from_kbuf() == 0x37)
+					code_with_E0 = TRUE;
+					if((scan_code = get_byte_from_kbuf()) == 0x37)
 					{
 						key = PRINTSCREEN;
 						make = TRUE;
@@ -166,18 +172,16 @@ PUBLIC void keyboard_read(TTY* tty)
 
 			if(scan_code == 0xB7)
 			{
-				if(get_byte_from_kbuf() == 0xE0)
+				code_with_E0 = FALSE;
+				if((scan_code = get_byte_from_kbuf()) == 0xE0)
 				{
-					if(get_byte_from_kbuf() == 0xAA)
+					code_with_E0 = TRUE;
+					if((scan_code = get_byte_from_kbuf()) == 0xAA)
 					{
 						key = PRINTSCREEN;
 						make = FALSE;
 					}
 				}
-			}
-			if(key == 0)
-			{
-				code_with_E0 = TRUE;
 			}
 		}
 		if((key != PAUSEBREAK) && (key != PRINTSCREEN))

@@ -23,7 +23,7 @@ PUBLIC int rw_sector(int io_type, int dev, u64 pos, int bytes, int proc_id, void
 	driver_msg.CNT		= bytes;
 	driver_msg.PROC_ID	= proc_id;
 
-	//printf("%d 0x%xla: " ,driver_msg.PROC_ID, driver_msg.BUF);
+	//printk("%d 0x%xla: " ,driver_msg.PROC_ID, driver_msg.BUF);
 
 	assert(dd_map[MAJOR(dev)].driver_id != INVALID_DRIVER);
 	send_recv(BOTH, dd_map[MAJOR(dev)].driver_id, &driver_msg);
@@ -34,19 +34,6 @@ PUBLIC int rw_sector(int io_type, int dev, u64 pos, int bytes, int proc_id, void
 PRIVATE void read_super_block(int dev)
 {
 	int i;
-	/*
-	MESSAGE driver_msg;
-
-	driver_msg.type		= DEV_READ;
-	driver_msg.DEVICE	= MINOR(dev);
-	driver_msg.POSITION	= SECTOR_SIZE * 1;
-	driver_msg.BUF		= fsbuf;
-	driver_msg.CNT		= SECTOR_SIZE;
-	driver_msg.PROC_ID	= TASK_FS;
-
-	assert(dd_map[MAJOR(dev)].driver_id != INVALID_DRIVER);
-	send_recv(BOTH, dd_map[MAJOR(dev)].driver_id, &driver_msg);
-	*/
 	RD_SECT(dev, 1);
 
 	for(i = 0; i < NR_SUPER_BLOCK; ++i)
@@ -134,7 +121,7 @@ PUBLIC inode * get_inode(int dev, int num)
 	return q;
 }
 
-PUBLIC void put_inode(inode* inode_ptr)
+PUBLIC void dec_inode(inode* inode_ptr)
 {
 	assert(inode_ptr->i_cnt > 0);
 	--inode_ptr->i_cnt;
@@ -191,7 +178,7 @@ PRIVATE void mkfs()
 	assert(dd_map[MAJOR(ROOT_DEV)].driver_id != INVALID_DRIVER);
 	send_recv(BOTH, dd_map[MAJOR(ROOT_DEV)].driver_id, &driver_msg);
 
-	printf("dev size: %d sectors\n", geo.size);
+	printk("dev size: %d sectors\n", geo.size);
 
 	/* Initial Super Block */
 	super_block sb;
@@ -223,7 +210,7 @@ PRIVATE void mkfs()
 	//RD_SECT(ROOT_DEV, 1);
 	//dump(fsbuf, SUPER_BLOCK_SIZE + 4);
 
-	printf("devbase:0x%x00, sb:0x%x00, imap:0x%x00, smap:0x%x00\n"
+	printk("devbase:0x%x00, sb:0x%x00, imap:0x%x00, smap:0x%x00\n"
 			"        inodes:0x%x00, 1st_sector:0x%x00\n", 
 			(geo.base * 2),
 			(geo.base + 1) * 2,
@@ -244,7 +231,7 @@ PRIVATE void mkfs()
 
 	/* Initial Sector Map */
 	memset(fsbuf, 0, SECTOR_SIZE);
-	int nr_sects = NR_DEFAULT_FILE_SECTS +1;
+	int nr_sects = NR_DEFAULT_FILE_SECTS + 1;
 
 	for(i = 0; i< nr_sects / 8; ++i)
 	{
@@ -291,7 +278,7 @@ PRIVATE void mkfs()
 	{
 		++de;
 		de->inode_id = i + 2;
-		sprintf(de->name, "dev_tty%d", i);
+		sprintf(de->name, "dev_tty%d", i + 1);
 	}
 	WR_SECT(ROOT_DEV, sb.first_sect);
 }
@@ -335,7 +322,7 @@ PRIVATE void fs_init()
 
 PUBLIC void task_fs()
 {
-	printf("File System Begin.\n");
+	printk("File System Begin.\n");
 
 	fs_init();
 	//clear_console();
@@ -346,7 +333,7 @@ PUBLIC void task_fs()
 		int src = fs_msg.source;
 		fs_caller = &proc_table[src];
 
-		//printf("fs_caller: %s\n", fs_caller->pname);
+		//printk("fs_caller: %s\n", fs_caller->pname);
 
 		switch(fs_msg.type)
 		{
@@ -363,14 +350,19 @@ PUBLIC void task_fs()
 		case UNLINK:
 			fs_msg.RETVAL = do_unlink();
 			break;
+		case RESUME_PROC:
+			src = fs_msg.PROC_ID;
+			break;
 		default:
 			dump_msg("FS::unknown message: ",&fs_msg);
 			assert(0);
 			break;
 		}
-
-		fs_msg.type = SYSCALL_RET;
-		send_recv(SEND, src, &fs_msg);
+		if(fs_msg.type != SUSPEND_PROC)
+		{
+			fs_msg.type = SYSCALL_RET;
+			send_recv(SEND, src, &fs_msg);
+		}
 	}
 
 	spin("FS");

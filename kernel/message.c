@@ -35,12 +35,12 @@ PRIVATE bool deadlock(int src, int des)
 			if(proc->sendto == src)
 			{
 				proc = proc_table + des;
-				printf("DeadLock: %s", proc->pname);
+				printk("DeadLock: %s", proc->pname);
 				do
 				{
 					assert(proc->pmsg);
 					proc = proc_table + proc->sendto;
-					printf("->%s", proc->pname);
+					printk("->%s", proc->pname);
 				} while (proc != proc_table + src);
 
 				return TRUE;
@@ -385,7 +385,7 @@ PUBLIC void dump_proc(PROCESS *proc)
 PUBLIC void dump_msg(const char * title, MESSAGE* msg)
 {
 	int packed = 0;
-	printf("{%s}<0x%x>{%ssrc:%s(%d),%stype:%d,%s(0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x)%s}%s",  //, (0x%x, 0x%x, 0x%x)}",
+	printk("{%s}<0x%x>{%ssrc:%s(%d),%stype:%d,%s(0x%x, 0x%x, 0x%x, 0x%x, 0x%x, 0x%x)%s}%s",  //, (0x%x, 0x%x, 0x%x)}",
 	       title,
 	       (int)msg,
 	       packed ? "" : "\n        ",

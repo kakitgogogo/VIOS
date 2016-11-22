@@ -17,6 +17,7 @@ PUBLIC int do_rdwt()
 	int fd = fs_msg.FD;
 	void* buf = fs_msg.BUF;
 	int len = fs_msg.CNT;
+	int pos = fs_caller->files[fd]->fd_pos;
 
 	int src = fs_msg.source;
 
@@ -26,8 +27,6 @@ PUBLIC int do_rdwt()
 	{
 		return -1;
 	}
-
-	int pos = fs_caller->files[fd]->fd_pos;
 
 	inode* inode_ptr = fs_caller->files[fd]->fd_inode;
 

@@ -84,6 +84,8 @@ typedef enum
 #define	TIMER_FREQ		1193182L
 #define	HZ				1000
 
+#define	MAX_TICKS		0x7FFFABCD
+
 /* 8042 */
 #define	KB_DATA			0x60
 #define	KB_CMD			0x64
@@ -161,6 +163,9 @@ enum msgtype
 	LSEEK,
 	STAT,
 	UNLINK,
+
+	SUSPEND_PROC,
+	RESUME_PROC,
 
 	SYSCALL_RET,
 

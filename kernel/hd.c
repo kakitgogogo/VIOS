@@ -111,7 +111,7 @@ PRIVATE void partition(int device, int style)
 		int s = ext_start_sect;
 		int nr_1st_sub = (j - 1) * NR_SUB_PER_PART;
 
-		//printf("nr_1st_sub: %d\n", nr_1st_sub);
+		//printk("nr_1st_sub: %d\n", nr_1st_sub);
 
 		for(i = 0; i < NR_SUB_PER_PART; ++i)
 		{
@@ -155,19 +155,19 @@ PRIVATE void print_identify_info(u16* hdinfo)
 			s[i*2] = *p++;
 		}
 		s[i*2] = 0;
-		printf("%s: %s\n", iinfo[k].desc, s);
+		printk("%s: %s\n", iinfo[k].desc, s);
 	}
 
 	int capabilities = hdinfo[49];
-	printf("LBA supported: %s\n",
+	printk("LBA supported: %s\n",
 	       (capabilities & 0x0200) ? "Yes" : "No");
 
 	int cmd_set_supported = hdinfo[83];
-	printf("LBA48 supported: %s\n",
+	printk("LBA48 supported: %s\n",
 	       (cmd_set_supported & 0x0400) ? "Yes" : "No");
 
 	int sectors = ((int)hdinfo[61] << 16) + hdinfo[60];
-	printf("HD size: %dMB\n", sectors * 512 / 1000000);
+	printk("HD size: %dMB\n", sectors * 512 / 1000000);
 }
 
 PRIVATE void hd_identify(int driver)
@@ -192,7 +192,7 @@ PRIVATE void print_hdinfo(hd_info* hdi)
 	int i;
 	for(i = 0; i < NR_PART_PER_DRIVER + 1; ++i)
 	{
-		printf("%sPART_%d: base %d(0x%x), size %d(0x%x) (in sector)\n",
+		printk("%sPART_%d: base %d(0x%x), size %d(0x%x) (in sector)\n",
 			i == 0 ? "  " : "    ",
 			i,
 			hdi->primary[i].base,
@@ -206,7 +206,7 @@ PRIVATE void print_hdinfo(hd_info* hdi)
 		{
 			continue;
 		}
-		printf("        %d: base %d(0x%x), size %d(0x%x) (in sector)\n",
+		printk("        %d: base %d(0x%x), size %d(0x%x) (in sector)\n",
 			i,
 			hdi->logical[i].base,
 			hdi->logical[i].base,
@@ -219,10 +219,10 @@ PRIVATE void hd_init()
 {
 	int i;
 
-	printf("\nHard Disk Information:\n");
+	printk("\nHard Disk Information:\n");
 
 	u8* nr_drivers = (u8*)(0x475); 
-	printf("Number of Drivers:%d.\n", *nr_drivers);
+	printk("Number of Drivers:%d.\n", *nr_drivers);
 	assert(*nr_drivers);
 
 	put_irq_handler(AT_WINI_IRQ, hd_handler);
@@ -232,8 +232,8 @@ PRIVATE void hd_init()
 	for(i = 0; i < (sizeof(hd_infos) / sizeof(hd_infos[0])); ++i)
 	{
 		memset(&hd_infos[i], 0, sizeof(hd_infos[0]));
-		hd_infos[0].open_cnt = 0;
 	}
+	hd_infos[0].open_cnt = 0;
 }
 
 PRIVATE void hd_open(int device)
@@ -282,12 +282,12 @@ PRIVATE void hd_rdwt(MESSAGE *msg)
 	cmd.command	= (msg->type == DEV_READ) ? ATA_READ : ATA_WRITE;
 	hd_cmd_out(&cmd);
 
-	//printf("%d 0x%xla: " , msg->PROC_ID, msg->BUF);
+	//printk("%d 0x%xla: " , msg->PROC_ID, msg->BUF);
 
 	int bytes_left = msg->CNT;
 	void* la = (void*)va2la(msg->PROC_ID, msg->BUF);
 
-	//printf("0x%x\n", la);
+	//printk("0x%x\n", la);
 
 	while(bytes_left)
 	{

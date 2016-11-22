@@ -62,14 +62,17 @@ start:
 
 	cmp		ebx, 0
 	jne		.loop
-	jmp		.end
+	jmp		.findkernel
 .fail:
 	mov	dword [MCRNumber16], 0
-.end:
+.findkernel:
 
 ; find kernel.bin
 %define stackBase BaseOfKernel 
 	mov	word [wSectorNo], SectorNoOfRootDirectory
+	xor		ah, ah
+	xor		dl, dl
+	int		13h
 .begin:
 	cmp	word [wRootDirSizeForLoop], 0
 	jz		.noloader	

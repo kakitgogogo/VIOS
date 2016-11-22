@@ -48,10 +48,10 @@ PUBLIC int kernel_main()
 
 		proc->ldt_selector = selector_ldt;
 
-		memcpy(&proc->ldts[0], &gdt[SELECTOR_KERNEL_CS>>3], sizeof(DESCRIPTOR));
+		memcpy(&proc->ldts[0], &gdt[SELECTOR_KERNEL_CS >> 3], sizeof(DESCRIPTOR));
 		proc->ldts[0].attr1 = DA_C | privilege << 5;
 
-		memcpy(&proc->ldts[1], &gdt[SELECTOR_KERNEL_DS>>3], sizeof(DESCRIPTOR));
+		memcpy(&proc->ldts[1], &gdt[SELECTOR_KERNEL_DS >> 3], sizeof(DESCRIPTOR));
 		proc->ldts[1].attr1 = DA_DRW | privilege << 5;
 
 		proc->regs.cs = (SELECTOR_IN_LDT(0) & SA_RPL_MASK & SA_TI_MASK) | SA_TIL | rpl;
@@ -116,18 +116,31 @@ void testA()
 {
 	while(1)
 	{
-		printf("<Ticks: %d>", get_ticks());
+		printk("<Ticks: %d>", get_ticks());
 		milli_delay(1000);
 	}
 }
 
 void testB()
 {
+	char tty_name[] = "/dev_tty3";
+
+	int fd_stdin = open(tty_name, O_RDWR);
+	assert(fd_stdin == 0);
+	int fd_stdout = open(tty_name, O_RDWR);
+	assert(fd_stdout == 1); 
+
+	char rdbuf[128];
+
 	while(1)
 	{
-		printf("B");
-		milli_delay(1000);
+		printf("$ ");
+		int num = read(fd_stdin, rdbuf, 70);
+		rdbuf[num] = 0;
+
+		printf("echo: %s\n", rdbuf);
 	}
+	assert(0);
 }
 
 void testC()
@@ -143,7 +156,7 @@ void testC()
 
 	fd = open(filename, O_CREAT | O_RDWR);
 	assert(fd != -1);
-	printf("File %s created(fd: %d)\n", filename, fd);
+	printk("File %s created(fd: %d)\n", filename, fd);
 
 	n = write(fd, bufw, strlen(bufw));
 	assert(n == strlen(bufw));
@@ -152,12 +165,12 @@ void testC()
 
 	fd = open(filename, O_RDWR);
 	assert(fd != -1);
-	printf("File opened(fd: %d)\n", fd);
+	printk("File opened(fd: %d)\n", fd);
 
 	n = read(fd, bufr, rd_bytes);
 	assert(n == rd_bytes);
 	bufr[n] = 0;
-	printf("%d bytes read: %s\n", n, bufr);
+	printk("%d bytes read: %s\n", n, bufr);
 
 	close(fd);
 
@@ -167,7 +180,7 @@ void testC()
 	{
 		fd = open(filenames[i], O_CREAT | O_RDWR);
 		assert(fd != -1);
-		printf("File %s created(fd: %d)\n", filenames[i], fd);
+		printk("File %s created(fd: %d)\n", filenames[i], fd);
 		close(fd);
 	}
 
@@ -176,11 +189,11 @@ void testC()
 	{
 		if(unlink(rfilenames[i]) == 0)
 		{
-			printf("File %s removed\n", rfilenames[i]);
+			printk("File %s removed\n", rfilenames[i]);
 		}
 		else
 		{
-			printf("Failed to remove file %s\n", rfilenames[i]);
+			printk("Failed to remove file %s\n", rfilenames[i]);
 		}
 	}
 

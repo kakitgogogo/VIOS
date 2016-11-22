@@ -76,13 +76,13 @@ PUBLIC void delay(int time)
 void dump(u8* address, int n)
 {
 	int i;
-	printf("Dump 0x%x:\n", address);
+	printk("Dump 0x%x:\n", address);
 	for(i = 0; i< n;)
 	{
-		printf("%02x  ", *(address++));
+		printk("%02x  ", *(address++));
 		++i;
-		if(i % 16 == 0) printf("\n");
-		else if(i % 8 == 0) printf("  ");
+		if(i % 16 == 0) printk("\n");
+		else if(i % 8 == 0) printk("  ");
 	}
-	printf("\n");
+	printk("\n");
 }
