@@ -10,7 +10,7 @@
 #include "proto.h"
 #include "keyboard.h"
 
-#define __TTY_DEBUF__
+//#define __TTY_DEBUF__
 
 PRIVATE void set_cursor(unsigned int position)
 {
@@ -246,15 +246,15 @@ PUBLIC void select_console(int console_id)
 	set_video_start_addr(console_table[console_id].current_start_addr);
 }
 
-PUBLIC void clear_console()
+PUBLIC void clear_console(int console_id)
 {
-	CONSOLE *console = &console_table[current_console_id];
+	CONSOLE *console = &console_table[console_id];
 
-	console->cursor = 0;
+	console->cursor = console->original_addr;
 	for(; console->cursor < console->original_addr + console->console_size - 1; )
 	{
 		out_char(console, ' ');
 	}
 
-	screen_init(&tty_table[current_console_id]);
+	screen_init(&tty_table[console_id]);
 }

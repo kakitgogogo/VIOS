@@ -22,7 +22,7 @@ LABEL_DESC_VIDEO:
 ;-------------------------------------------------------------------------------------
 GdtLen		equ	$ - LABEL_GDT
 GdtPtr		dw	GdtLen - 1
-			dd	BaseOfLoaderPhyAddr + LABEL_GDT
+			dd	LoaderPhyAddr + LABEL_GDT
 ;-------------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------------
@@ -68,26 +68,26 @@ start:
 .findkernel:
 
 ; find kernel.bin
-%define stackBase BaseOfKernel 
+%define StackBase KernelBinBase 
 	mov	word [wSectorNo], SectorNoOfRootDirectory
 	xor		ah, ah
 	xor		dl, dl
 	int		13h
 .begin:
 	cmp	word [wRootDirSizeForLoop], 0
-	jz		.noloader	
+	jz		.nokernel	
 
 	dec	word [wRootDirSizeForLoop]
 
-	mov		ax, BaseOfKernel
+	mov		ax, KernelBinBase
 	mov		es, ax	
-	mov		bx, OffsetOfKernel
+	mov		bx, KernelBinOffset
 	mov		ax, [wSectorNo]
 	mov		cl, 1
 	call	readSector
 
 	mov		si, kernel
-	mov		di, OffsetOfKernel
+	mov		di, KernelBinOffset
 	cld
 	mov		dx, 10h
 .search:
@@ -114,7 +114,7 @@ start:
 .nextSector:
 	add	word [wSectorNo], 1
 	jmp		.begin
-.noloader:
+.nokernel:
 	mov		dh, 2
 	call	displayStr	
 	jmp		.jumppm
@@ -128,9 +128,9 @@ start:
 	add		cx, ax
 	add		cx, DeltaSectorNo
 
-	mov		ax, BaseOfKernel
+	mov		ax, KernelBinBase
 	mov		es, ax	
-	mov		bx, OffsetOfKernel
+	mov		bx, KernelBinOffset
 	mov		ax, cx	
 .more:
 	mov		cl, 1
@@ -165,7 +165,7 @@ start:
 	or		eax, 1
 	mov		cr0, eax
 
-	jmp	dword SelectorFlatC:(BaseOfLoaderPhyAddr+start32)
+	jmp	dword SelectorFlatC:(LoaderPhyAddr+start32)
 ;-------------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------------
@@ -185,7 +185,7 @@ msg2		db	"No KERNEL."
 row			equ	3
 ;-------------------------------------------------------------------------------------
 
-%include "func.inc"
+%include "utility.inc"
 
 ;-------------------------------------------------------------------------------------
 ; function  killMotor
@@ -198,7 +198,6 @@ killMotor:
 	pop		dx
 	ret
 ;-------------------------------------------------------------------------------------
-
 
 ;=================PROTECT MODE==================
 
@@ -230,9 +229,16 @@ start32:
 
 	call	initKernel
 
-	jmp		SelectorFlatC:KernelEntryPhyAddr
-;-------------------------------------------------------------------------------------
+	mov	dword [BOOT_PARAM_ADDR], BOOT_PARAM_MAGIC
+	mov		eax, [MemSize]
+	mov		[BOOT_PARAM_ADDR + 4], eax
+	mov		eax, KernelBinBase
+	shl		eax, 4
+	add		eax, KernelBinOffset
+	mov		[BOOT_PARAM_ADDR + 8], eax
 
+	jmp		SelectorFlatC:KernelPhyAddr
+;-------------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------------
 ; function displayAL
@@ -274,7 +280,6 @@ displayAL:
 	ret
 ;-------------------------------------------------------------------------------------
 
-
 ;-------------------------------------------------------------------------------------
 ; function displayInt
 ;-------------------------------------------------------------------------------------
@@ -304,7 +309,6 @@ displayInt:
 
 	ret
 ;-------------------------------------------------------------------------------------
-
 
 ;-------------------------------------------------------------------------------------
 ; function displayStr32
@@ -351,7 +355,6 @@ displayStr32:
 	ret
 ;-------------------------------------------------------------------------------------
 
-
 ;-------------------------------------------------------------------------------------
 ; function endline
 ;-------------------------------------------------------------------------------------
@@ -362,7 +365,6 @@ endline:
 
 	ret
 ;-------------------------------------------------------------------------------------
-
 
 ;-------------------------------------------------------------------------------------
 ; function memcpy
@@ -403,7 +405,6 @@ memcpy:
 
 	ret	
 ;-------------------------------------------------------------------------------------
-
 
 ;-------------------------------------------------------------------------------------
 ; function displayMemInfo
@@ -513,16 +514,15 @@ setupPaging:
 	ret
 ;-------------------------------------------------------------------------------------
 
-
 ;-------------------------------------------------------------------------------------
 ; function initKernel
 ;-------------------------------------------------------------------------------------
 initKernel:	
 	xor		esi, esi
-	mov		cx, word [BaseOfKernelPhyAddr + 2Ch]  	;e_phnum
+	mov		cx, word [KernelBinPhyAddr + 2Ch]  	;e_phnum
 	movzx	ecx, cx	
-	mov		esi, [BaseOfKernelPhyAddr + 1Ch]		;e_phoff
-	add		esi, BaseOfKernelPhyAddr
+	mov		esi, [KernelBinPhyAddr + 1Ch]		;e_phoff
+	add		esi, KernelBinPhyAddr
 .begin:
 	mov		eax, [esi + 0]
 	cmp		eax, 0			
@@ -530,7 +530,7 @@ initKernel:
 	
 	push	dword [esi + 010h]		
 	mov		eax, [esi + 04h]		
-	add		eax, BaseOfKernelPhyAddr
+	add		eax, KernelBinPhyAddr
 	push	eax	
 	push	dword [esi + 08h]	
 	call	memcpy	
@@ -542,7 +542,6 @@ initKernel:
 
 	ret
 ;-------------------------------------------------------------------------------------
-
 
 ;-------------------------------------------------------------------------------------
 ; SECTION .data1
@@ -571,24 +570,23 @@ ARDStruct16:
 MemBuf16:	times	1024	db	0
 
 ; 32 bits
-Title				equ	BaseOfLoaderPhyAddr + Title16
-RAMSize				equ	BaseOfLoaderPhyAddr + RAMSize16
-Endl				equ	BaseOfLoaderPhyAddr + Endl16
+Title				equ	LoaderPhyAddr + Title16
+RAMSize				equ	LoaderPhyAddr + RAMSize16
+Endl				equ	LoaderPhyAddr + Endl16
 
-MCRNumber			equ	BaseOfLoaderPhyAddr + MCRNumber16
-DispPos				equ	BaseOfLoaderPhyAddr + DispPos16
-MemSize				equ	BaseOfLoaderPhyAddr + MemSize16
+MCRNumber			equ	LoaderPhyAddr + MCRNumber16
+DispPos				equ	LoaderPhyAddr + DispPos16
+MemSize				equ	LoaderPhyAddr + MemSize16
 
-ARDStruct			equ	BaseOfLoaderPhyAddr + ARDStruct16
-	BaseAddrLow		equ	BaseOfLoaderPhyAddr + BaseAddrLow16
-	BaseAddrHigh	equ	BaseOfLoaderPhyAddr + BaseAddrHigh16
-	LengthLow		equ	BaseOfLoaderPhyAddr + LengthLow16
-	LengthHigh		equ	BaseOfLoaderPhyAddr + LengthHigh16
-	Type			equ	BaseOfLoaderPhyAddr + Type16
+ARDStruct			equ	LoaderPhyAddr + ARDStruct16
+	BaseAddrLow		equ	LoaderPhyAddr + BaseAddrLow16
+	BaseAddrHigh	equ	LoaderPhyAddr + BaseAddrHigh16
+	LengthLow		equ	LoaderPhyAddr + LengthLow16
+	LengthHigh		equ	LoaderPhyAddr + LengthHigh16
+	Type			equ	LoaderPhyAddr + Type16
 
-MemBuf				equ	BaseOfLoaderPhyAddr + MemBuf16
-
+MemBuf				equ	LoaderPhyAddr + MemBuf16
 
 StackSpace:	times	1000h	db	0
-TopOfStack	equ	BaseOfLoaderPhyAddr + $	
+TopOfStack	equ	LoaderPhyAddr + $	
 ;-------------------------------------------------------------------------------------

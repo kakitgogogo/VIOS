@@ -1,0 +1,9 @@
+#!/bin/bash
+
+seek=`echo "obase=16;ibase=16;(\`egrep -e '^ROOT_BASE' ../boot/include/load.inc | sed -e 's/.*0x//g'\`+\`egrep -e '#define[[:space:]]*INSTALL_START_SECT' ../include/config.h | sed -e 's/.*0x//g'\`)*200" | bc`
+
+echo $seek
+
+count=`ls -l cmd.tar | awk -F " " '{print $$5}'`
+
+echo $count

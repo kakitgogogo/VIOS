@@ -42,19 +42,19 @@ void	hwint13();
 void	hwint14();
 void	hwint15();
 
-PUBLIC u32 seg2phys(u16 selector)
+PUBLIC u32 get_seg_base(u16 selector)
 {
 	DESCRIPTOR* item = &gdt[selector>>3];
 	return (item->base_high<<24 | item->base_mid<<16 | item->base_low);
 }
 
-PRIVATE void init_descriptor(DESCRIPTOR *desc, u32 base, u32 limit, u16 attribute)
+PUBLIC void init_descriptor(DESCRIPTOR *desc, u32 base, u32 limit, u16 attribute)
 {
 	desc->limit_low		= limit & 0xFFFF;
 	desc->base_low		= base & 0xFFFF;
 	desc->base_mid		= (base >> 16) & 0x0FF;
 	desc->attr1			= attribute & 0xFF;
-	desc->limit_high_attr2	= ((limit>>16) & 0x0F) | ((attribute>>8) & 0xF0);
+	desc->limit_high_attr2	= ((limit >> 16) & 0x0F) | ((attribute >> 8) & 0xF0);
 	desc->base_high		= (base >> 24) & 0x0FF;
 }
 
@@ -129,7 +129,7 @@ PUBLIC void protect_init()
 	tss.ss0 = SELECTOR_KERNEL_DS;
 	init_descriptor(	
 		&gdt[INDEX_TSS], 
-		vir2phys(seg2phys(SELECTOR_KERNEL_DS), &tss),
+		get_linear_addr(SELECTOR_KERNEL_DS, &tss),
 		sizeof(tss) - 1,
 		DA_386TSS);
 	tss.iobase = sizeof(tss);
@@ -138,9 +138,12 @@ PUBLIC void protect_init()
 	u16 index_ldt = INDEX_LDT_FIRST;
 	for(i = 0; i < NR_TASKS + NR_PROCS; ++i)
 	{
+		memset(&proc_table[i], 0, sizeof(PROCESS));
+		proc_table[i].ldt_selector = SELECTOR_LDT_FIRST + (i << 3);
+
 		init_descriptor(	
 			&gdt[index_ldt], 
-			vir2phys(seg2phys(SELECTOR_KERNEL_DS), proc_table[i].ldts),
+			get_linear_addr(SELECTOR_KERNEL_DS, proc_table[i].ldts),
 			LDT_SIZE * sizeof(DESCRIPTOR) - 1,
 			DA_LDT);
 		++index_ldt;

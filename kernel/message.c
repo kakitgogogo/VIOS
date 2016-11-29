@@ -277,34 +277,6 @@ PUBLIC int sys_sendrec(int function, int src_des, MESSAGE* msg, PROCESS* proc)
 	return 0;
 }
 
-PUBLIC int send_recv(int function, int src_des, MESSAGE* msg)
-{
-	int ret = 0;
-
-	if(function == RECEIVE)
-	{
-		memset(msg, 0, sizeof(MESSAGE));
-	}
-
-	switch(function)
-	{
-	case BOTH:
-		ret = sendrec(SEND, src_des, msg);
-		if(ret == 0)
-			ret = sendrec(RECEIVE, src_des, msg);
-		break;
-	case SEND:
-	case RECEIVE:
-		ret = sendrec(function, src_des, msg);
-		break;
-	default:
-		assert((function == BOTH) || (function == SEND) || (function == RECEIVE));
-		break;
-	}
-
-	return ret;
-}
-
 PUBLIC void inform_int(int task_id)
 {
 	PROCESS *proc = proc_table + task_id;
@@ -380,6 +352,17 @@ PUBLIC void dump_proc(PROCESS *proc)
 	disp_color_str("\n", text_color);
 	sprintf(info, "has_int_msg: 0x%x.  ", proc->has_int_msg); 
 	disp_color_str(info, text_color);
+
+	disp_color_str("\n\n", text_color);
+	disp_color_str("Process inode: ", text_color);
+	for(i = 0; i < NR_FILES; ++i)
+	{
+		if(proc->files[i])
+		{
+			sprintf(info, "0x%x.  ", proc->files[i]->fd_inode); 
+			disp_color_str(info, text_color);
+		}
+	}
 }
 
 PUBLIC void dump_msg(const char * title, MESSAGE* msg)

@@ -11,9 +11,39 @@
 #include "keyboard.h"
 #include "stdio.h"
 
+
+PUBLIC int send_recv(int function, int src_des, MESSAGE* msg)
+{
+	int ret = 0;
+
+	if(function == RECEIVE)
+	{
+		memset(msg, 0, sizeof(MESSAGE));
+	}
+
+	switch(function)
+	{
+	case BOTH:
+		ret = sendrec(SEND, src_des, msg);
+		if(ret == 0)
+			ret = sendrec(RECEIVE, src_des, msg);
+		break;
+	case SEND:
+	case RECEIVE:
+		ret = sendrec(function, src_des, msg);
+		break;
+	default:
+		assert((function == BOTH) || (function == SEND) || (function == RECEIVE));
+		break;
+	}
+
+	return ret;
+}
+
+
 PUBLIC void spin(char *func_name)
 {
-	printk("\nSpinning in %s ...\n", func_name);
+	printk("[SPIN] Spinning in %s ...\n", func_name);
 	while(1);
 }
 

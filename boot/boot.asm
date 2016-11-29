@@ -35,7 +35,7 @@ start:
 	int		13h
 
 ; find loader.bin
-%define stackBase BaseOfLoader
+%define StackBase LoaderBase
 	mov	word [wSectorNo], SectorNoOfRootDirectory
 .begin:
 	cmp	word [wRootDirSizeForLoop], 0
@@ -43,15 +43,15 @@ start:
 
 	dec	word [wRootDirSizeForLoop]
 
-	mov		ax, BaseOfLoader
+	mov		ax, LoaderBase
 	mov		es, ax	
-	mov		bx, OffsetOfLoader
+	mov		bx, LoaderOffset
 	mov		ax, [wSectorNo]
 	mov		cl, 1
 	call	readSector
 
 	mov		si, loader
-	mov		di, OffsetOfLoader
+	mov		di, LoaderOffset
 	cld
 	mov		dx, 10h
 .search:
@@ -92,9 +92,9 @@ start:
 	add		cx, ax
 	add		cx, DeltaSectorNo
 
-	mov		ax, BaseOfLoader
+	mov		ax, LoaderBase
 	mov		es, ax	
-	mov		bx, OffsetOfLoader	
+	mov		bx, LoaderOffset
 	mov		ax, cx	
 .more:
 	mov		cl, 1
@@ -114,7 +114,7 @@ start:
 	mov		dh, 1
 	call	displayStr	
 
-	jmp	BaseOfLoader:OffsetOfLoader
+	jmp		LoaderBase:LoaderOffset
 ;-------------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------------
@@ -133,11 +133,11 @@ msg2		db	"No LOADER "
 row			equ	0
 ;-------------------------------------------------------------------------------------
 
-%include "func.inc"
+%include "utility.inc"
 
 ;----------------------------------------------------------------------------
 ; end
 ;----------------------------------------------------------------------------
-times 	510-($-$$)	db	0
+times 	510 - ($ - $$)	db	0
 dw 		0xaa55
 ;----------------------------------------------------------------------------

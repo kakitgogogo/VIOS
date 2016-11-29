@@ -1,5 +1,9 @@
-#ifndef	VISO_TYPE_H
+#ifndef	VIOS_TYPE_H
 #define	VIOS_TYPE_H
+
+/* Function Type */
+#define	PUBLIC
+#define	PRIVATE	static
 
 typedef	unsigned long long	u64;
 typedef	unsigned int			u32;
@@ -9,9 +13,15 @@ typedef	unsigned char		u8;
 typedef	char*				va_list;
 
 typedef	void	(*int_handler)	();
-typedef void		(*task_f)		();
+typedef	void	(*task_f)		();
 typedef	void	(*irq_handler)	(int irq);
 
 typedef	void*	system_call;
+
+typedef struct boot_param
+{
+	int	mem_size;
+	unsigned char* kernel_bin;
+}boot_params;
 
 #endif 

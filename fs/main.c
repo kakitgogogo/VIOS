@@ -178,7 +178,7 @@ PRIVATE void mkfs()
 	assert(dd_map[MAJOR(ROOT_DEV)].driver_id != INVALID_DRIVER);
 	send_recv(BOTH, dd_map[MAJOR(ROOT_DEV)].driver_id, &driver_msg);
 
-	printk("dev size: %d sectors\n", geo.size);
+	printk("[FS] dev size: %d sectors\n", geo.size);
 
 	/* Initial Super Block */
 	super_block sb;
@@ -210,8 +210,8 @@ PRIVATE void mkfs()
 	//RD_SECT(ROOT_DEV, 1);
 	//dump(fsbuf, SUPER_BLOCK_SIZE + 4);
 
-	printk("devbase:0x%x00, sb:0x%x00, imap:0x%x00, smap:0x%x00\n"
-			"        inodes:0x%x00, 1st_sector:0x%x00\n", 
+	printk("[FS] devbase:0x%x00, sb:0x%x00, imap:0x%x00, smap:0x%x00\n"
+			"[FS]\t\tinodes:0x%x00, 1st_sector:0x%x00\n", 
 			(geo.base * 2),
 			(geo.base + 1) * 2,
 			(geo.base + 1 + 1) * 2,
@@ -221,17 +221,19 @@ PRIVATE void mkfs()
 
 	/* Initial Inode Map */
 	memset(fsbuf, 0, SECTOR_SIZE);
-	for(i = 0; i < (NR_CONSOLES + 2); ++i)
+	for(i = 0; i < (NR_CONSOLES + 3); ++i)
 	{
 		fsbuf[0] |= 1 << i;
 	}
-	assert(fsbuf[0] == 0x1F);
+	assert(fsbuf[0] == 0x3F);
 
 	WR_SECT(ROOT_DEV, 2);
 
 	/* Initial Sector Map */
 	memset(fsbuf, 0, SECTOR_SIZE);
-	int nr_sects = NR_DEFAULT_FILE_SECTS + 1;
+
+	int nr_sects = NR_DEFAULT_FILE_SECTS + 1; 
+	/* bit 0 is reserved, NR_DEFAULT_FILE_SECTS for '/' */
 
 	for(i = 0; i< nr_sects / 8; ++i)
 	{
@@ -243,18 +245,44 @@ PRIVATE void mkfs()
 	}
 	WR_SECT(ROOT_DEV, 2 + sb.nr_imap_sects);
 
+	/* zeromemory the rest sector-map */
 	memset(fsbuf, 0, SECTOR_SIZE);
 	for(i = 1; i< sb.nr_smap_sects; ++i)
 	{
 		WR_SECT(ROOT_DEV, 2 + sb.nr_imap_sects + i);
 	}
 
+	/* cmd.tar */
+	assert(INSTALL_START_SECT + INSTALL_NR_SECTS < sb.nr_sects - NR_SECTS_FOR_LOG);
+	int bit_offset = INSTALL_START_SECT - sb.first_sect + 1;
+	int bit_off_in_sect = bit_offset % (SECTOR_SIZE * 8);
+	int bit_left = INSTALL_NR_SECTS;
+	int cur_sect = bit_offset / (SECTOR_SIZE * 8);
+	RD_SECT(ROOT_DEV, 2 + sb.nr_imap_sects + cur_sect);
+	while(bit_left)
+	{
+		int byte_off = bit_off_in_sect / 8;
+		fsbuf[byte_off] |= 1 << (bit_off_in_sect % 8);
+		bit_left--;
+		bit_off_in_sect++;
+		if(bit_off_in_sect == (SECTOR_SIZE * 8))
+		{
+			WR_SECT(ROOT_DEV, 2 + sb.nr_imap_sects + cur_sect);
+			++cur_sect;
+			RD_SECT(ROOT_DEV, 2 + sb.nr_imap_sects + cur_sect);
+			bit_off_in_sect = 0;
+		}
+	}
+	WR_SECT(ROOT_DEV, 2 + sb.nr_imap_sects + cur_sect);
+
 	/* Initial Inode of '/' */
 	memset(fsbuf, 0, SECTOR_SIZE);
 	inode *inode_ptr = (inode*)fsbuf;
 	inode_ptr->i_mode = I_DIRECTORY;
-	inode_ptr->i_size = DIR_ENTRY_SIZE * 4;
+	inode_ptr->i_size = DIR_ENTRY_SIZE * 5; 
+	/* 5 files: '.', 'dev_tty1', 'dev_tty2', 'dev_tty3', 'cmd.tar' */
 
+	/* inode of 'dev_tty1~3' */
 	inode_ptr->i_start_sect = sb.first_sect;
 	inode_ptr->i_nr_sects = NR_DEFAULT_FILE_SECTS;
 	for(i = 0; i< NR_CONSOLES; ++i)
@@ -265,6 +293,14 @@ PRIVATE void mkfs()
 		inode_ptr->i_start_sect = MAKE_DEV(DEV_CHAR_TTY, i);
 		inode_ptr->i_nr_sects = 0;
 	}
+
+	/* inode of 'cmd.tar' */
+	inode_ptr = (inode*)(fsbuf + (INODE_SIZE* (NR_CONSOLES + 1)));
+	inode_ptr->i_mode = I_REGULAR;
+	inode_ptr->i_size = INSTALL_NR_SECTS * SECTOR_SIZE;
+	inode_ptr->i_start_sect = INSTALL_START_SECT;
+	inode_ptr->i_nr_sects = INSTALL_NR_SECTS;
+
 	WR_SECT(ROOT_DEV, 2 + sb.nr_imap_sects + sb.nr_smap_sects);
 
 	/* '/' */
@@ -280,6 +316,8 @@ PRIVATE void mkfs()
 		de->inode_id = i + 2;
 		sprintf(de->name, "dev_tty%d", i + 1);
 	}
+	(++de)->inode_id = NR_CONSOLES + 2;
+	strcpy(de->name, "cmd.tar");
 	WR_SECT(ROOT_DEV, sb.first_sect);
 }
 
@@ -320,12 +358,46 @@ PRIVATE void fs_init()
 	root_inode = get_inode(ROOT_DEV, ROOT_INODE);
 }
 
+PRIVATE int fs_fork()
+{
+	int i;
+	PROCESS* child = &proc_table[fs_msg.PID];
+	for(i = 0; i < NR_FILES; ++i)
+	{
+		if(child->files[i])
+		{
+			++(child->files[i]->fd_cnt);
+			++(child->files[i]->fd_inode->i_cnt);
+		}
+	}
+	return 0;
+}
+
+PRIVATE int fs_exit()
+{
+	int i;
+	PROCESS* proc = &proc_table[fs_msg.PID];
+	for(i = 0; i < NR_FILES; ++i)
+	{
+		if(proc->files[i])
+		{
+			--(proc->files[i]->fd_inode->i_cnt);
+			if(--(proc->files[i]->fd_cnt) == 0)
+			{
+				proc->files[i]->fd_inode = 0;
+			}
+			proc->files[i] = 0;
+		}
+	}
+	return 0;
+}
+
 PUBLIC void task_fs()
 {
-	printk("File System Begin.\n");
+	printk("[FS] File System Begin.\n");
 
 	fs_init();
-	//clear_console();
+	//clear_console(0);
 	while(1)
 	{
 		send_recv(RECEIVE, ANY, &fs_msg);
@@ -353,6 +425,16 @@ PUBLIC void task_fs()
 		case RESUME_PROC:
 			src = fs_msg.PROC_ID;
 			break;
+		case FORK:
+			fs_msg.RETVAL = fs_fork();
+			break;
+		case EXIT:
+			fs_msg.RETVAL = fs_exit();
+			break;
+		/*
+		case STAT:
+			fs_msg.RETVAL = do_stat();
+		*/
 		default:
 			dump_msg("FS::unknown message: ",&fs_msg);
 			assert(0);

@@ -30,6 +30,15 @@ PUBLIC int do_rdwt()
 
 	inode* inode_ptr = fs_caller->files[fd]->fd_inode;
 
+	if(!((inode_ptr >= &inode_table[0] && inode_ptr < &inode_table[NR_INODE])))
+	{
+		printk("inode_ptr: 0x%x\n", inode_ptr);
+		printk("inode_table[0]: 0x%x\tinode_table[NR_INODE]: 0x%x\n", 
+			&inode_table[0], 
+			&inode_table[NR_INODE]);
+		dump_proc(fs_caller);
+		BREAK_POINT;
+	}
 	assert(inode_ptr >= &inode_table[0] && inode_ptr < &inode_table[NR_INODE]);
 
 	int imode = inode_ptr->i_mode & I_TYPE_MASK;
@@ -40,7 +49,7 @@ PUBLIC int do_rdwt()
 		fs_msg.type = type;
 
 		int dev = inode_ptr->i_start_sect;
-		assert(MAJOR(dev) == 4);
+		assert(MAJOR(dev) == DEV_CHAR_TTY);
 
 		fs_msg.DEVICE = MINOR(dev);
 		fs_msg.BUF = buf;

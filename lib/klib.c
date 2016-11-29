@@ -1,4 +1,5 @@
 #include "const.h"
+#include "config.h"
 #include "type.h"
 #include "protect.h"
 #include "string.h"
@@ -9,6 +10,60 @@
 #include "global.h"
 #include "proto.h"
 #include "keyboard.h"
+
+/* GNU */
+#include "elf.h"
+
+PUBLIC void get_boot_params(boot_params* bp)
+{
+	int* p = (int*)BOOT_PARAM_ADDR;
+	assert(p[BI_MAGIC] == BOOT_PARAM_MAGIC);
+
+	bp->mem_size = p[BI_MEM_SIZE];
+	bp->kernel_bin = (unsigned*)(p[BI_KERNEL_BIN]);
+
+	assert(memcmp(bp->kernel_bin, ELFMAG, SELFMAG) == 0);
+}
+
+PUBLIC int get_kernel_map(unsigned int* base, unsigned int* limit)
+{
+	boot_params bp;
+	get_boot_params(&bp);
+
+	Elf32_Ehdr* elf_header = (Elf32_Ehdr*)(bp.kernel_bin);
+
+	if(memcmp(elf_header->e_ident, ELFMAG, SELFMAG) != 0)
+	{
+		return -1;
+	}
+
+	*base = ~0;
+	unsigned int top = 0;
+	int i;
+	for (i = 0; i < elf_header->e_shnum; ++i) 
+	{
+		Elf32_Shdr* section_header = (Elf32_Shdr*)
+			(bp.kernel_bin + 
+			elf_header->e_shoff + 
+			i * elf_header->e_shentsize);
+
+		if (section_header->sh_flags & SHF_ALLOC) 
+		{
+			int bottom = section_header->sh_addr;
+			int tmp = section_header->sh_addr +
+				section_header->sh_size;
+
+			if (*base > bottom)
+				*base = bottom;
+			if (top < tmp)
+				top = tmp;
+		}
+	}
+	assert(*base < top);
+	*limit = top - *base - 1;
+
+	return 0;
+}
 
 PUBLIC char* itoa(char *str, int num)
 {

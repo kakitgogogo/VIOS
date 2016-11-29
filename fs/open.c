@@ -206,7 +206,7 @@ PUBLIC int do_open()
 	{
 		if(inode_id)
 		{
-			printk("File Exists.\n");
+			printk("[FS] file '%s' exists.\n", pathname);
 			return -1;
 		}
 		else
@@ -231,6 +231,7 @@ PUBLIC int do_open()
 
 		fd_table[i].fd_inode = inode_ptr;
 		fd_table[i].fd_mode = flags;
+		fd_table[i].fd_cnt = 1;
 		fd_table[i].fd_pos = 0;
 
 		int imode = inode_ptr->i_mode & I_TYPE_MASK;

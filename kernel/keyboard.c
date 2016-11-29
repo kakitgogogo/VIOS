@@ -136,11 +136,11 @@ PUBLIC void keyboard_read(TTY* tty)
 		if(scan_code == 0xE1)
 		{
 			int i;
-			u8 pausebrk_scode[] = {0xE1, 0x1D, 0x45, 0xE1, 0x9D, 0xC5};
+			u8 pausebreak_scode[] = {0xE1, 0x1D, 0x45, 0xE1, 0x9D, 0xC5};
 			bool is_pausebreak = TRUE;
 			for(i = 1; i < 6; ++i)
 			{
-				if(get_byte_from_kbuf() != pausebrk_scode[i])
+				if(get_byte_from_kbuf() != pausebreak_scode[i])
 				{
 					is_pausebreak = FALSE;
 					break;

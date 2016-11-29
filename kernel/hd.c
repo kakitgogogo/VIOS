@@ -144,7 +144,7 @@ PRIVATE void print_identify_info(u16* hdinfo)
 		int idx;
 		int len;
 		char *desc;
-	}iinfo[] = {{10, 20, "HD SN"}, {27, 40, "HD Model"}};
+	}iinfo[] = {{10, 20, "[HD] SN"}, {27, 40, "[HD] Model"}};
 
 	for(k = 0; k < sizeof(iinfo) / sizeof(iinfo[0]); ++k)
 	{
@@ -159,15 +159,15 @@ PRIVATE void print_identify_info(u16* hdinfo)
 	}
 
 	int capabilities = hdinfo[49];
-	printk("LBA supported: %s\n",
+	printk("[HD] LBA supported: %s\n",
 	       (capabilities & 0x0200) ? "Yes" : "No");
 
 	int cmd_set_supported = hdinfo[83];
-	printk("LBA48 supported: %s\n",
+	printk("[HD] LBA48 supported: %s\n",
 	       (cmd_set_supported & 0x0400) ? "Yes" : "No");
 
 	int sectors = ((int)hdinfo[61] << 16) + hdinfo[60];
-	printk("HD size: %dMB\n", sectors * 512 / 1000000);
+	printk("[HD] HD size: %dMB\n", sectors * 512 / 1000000);
 }
 
 PRIVATE void hd_identify(int driver)
@@ -192,7 +192,7 @@ PRIVATE void print_hdinfo(hd_info* hdi)
 	int i;
 	for(i = 0; i < NR_PART_PER_DRIVER + 1; ++i)
 	{
-		printk("%sPART_%d: base %d(0x%x), size %d(0x%x) (in sector)\n",
+		printk("[HD] %sPART_%d: base %d(0x%x), size %d(0x%x) (in sector)\n",
 			i == 0 ? "  " : "    ",
 			i,
 			hdi->primary[i].base,
@@ -206,7 +206,7 @@ PRIVATE void print_hdinfo(hd_info* hdi)
 		{
 			continue;
 		}
-		printk("        %d: base %d(0x%x), size %d(0x%x) (in sector)\n",
+		printk("[HD] \t\t%d: base %d(0x%x), size %d(0x%x) (in sector)\n",
 			i,
 			hdi->logical[i].base,
 			hdi->logical[i].base,
@@ -219,10 +219,10 @@ PRIVATE void hd_init()
 {
 	int i;
 
-	printk("\nHard Disk Information:\n");
+	printk("[HD] Hard Disk Information:\n");
 
 	u8* nr_drivers = (u8*)(0x475); 
-	printk("Number of Drivers:%d.\n", *nr_drivers);
+	printk("[HD] Number of Drivers:%d.\n", *nr_drivers);
 	assert(*nr_drivers);
 
 	put_irq_handler(AT_WINI_IRQ, hd_handler);
