@@ -68,7 +68,7 @@ start:
 .findkernel:
 
 ; find kernel.bin
-%define StackBase KernelBinBase 
+%define StackBase KernelBinSeg
 	mov	word [wSectorNo], SectorNoOfRootDirectory
 	xor		ah, ah
 	xor		dl, dl
@@ -79,15 +79,15 @@ start:
 
 	dec	word [wRootDirSizeForLoop]
 
-	mov		ax, KernelBinBase
+	mov		ax, KernelBinSeg
 	mov		es, ax	
-	mov		bx, KernelBinOffset
+	mov		bx, KernelBinOff
 	mov		ax, [wSectorNo]
 	mov		cl, 1
 	call	readSector
 
 	mov		si, kernel
-	mov		di, KernelBinOffset
+	mov		di, KernelBinOff
 	cld
 	mov		dx, 10h
 .search:
@@ -98,7 +98,7 @@ start:
 .cmpName:
 	cmp		cx, 0
 	jz		.found
-	dec	cx
+	dec		cx
 	lodsb
 	cmp		al, byte [es:di]
 	jz		.next
@@ -117,42 +117,64 @@ start:
 .nokernel:
 	mov		dh, 2
 	call	displayStr	
-	jmp		.jumppm
+	jmp		$
 .found:	
 	mov		ax, RootDirSectors
 	and		di, 0FFE0h	
-	add		di, 01Ah	
 
+	push	eax
+	mov		eax, [es : di + 01Ch]		
+	mov dword [dwKernelSize], eax
+	cmp		eax, KERNEL_VALID_SPACE
+	ja		.toolarge
+	pop		eax
+	jmp		.valid
+.toolarge:
+	mov		dh, 3
+	call	displayStr
+	jmp		$
+.valid:
+	add		di, 01Ah	
 	mov		cx, word [es:di]
-	push	cx	
+	push	cx			; 保存此 Sector 在 FAT 中的序号
 	add		cx, ax
 	add		cx, DeltaSectorNo
 
-	mov		ax, KernelBinBase
+	mov		ax, KernelBinSeg
 	mov		es, ax	
-	mov		bx, KernelBinOffset
+	mov		bx, KernelBinOff
 	mov		ax, cx	
 .more:
 	mov		cl, 1
 	call	readSector
-	pop		ax	
+	pop		ax			; 取出此 Sector 在 FAT 中的序号
 	call	getFAT
 	cmp		ax, 0FFFh
-	jz		.ok
+	jz		.finish
 
-	push	ax	
+	push	ax			; 保存此 Sector 在 FAT 中的序号
 	mov		dx, RootDirSectors
 	add		ax, dx
 	add		ax, DeltaSectorNo
 	add		bx, [BPB_BytsPerSec]
+	jc		.upper64k	; 如果 bx 重新变成 0，说明内核大于 64K（bx最大为0xFFFF，即64K）
+	jmp		.jmp_more
+.upper64k:
+	push	ax
+	mov		ax, es
+	add		ax, 1000h
+	mov		es, ax
+	pop		ax
+.jmp_more:
 	jmp		.more
-.ok:
+
+.finish:
 	call	killMotor
 	mov		dh, 1
 	call	displayStr
 	
 ; jump to protect mode
-.jumppm:
+.jmp_pm:
 	lgdt	[GdtPtr]
 
 	cli
@@ -181,6 +203,7 @@ msgLen		equ	10
 msg0		db	"Loading..."	
 msg1		db	"Done      "	
 msg2		db	"No KERNEL."	
+msg3		db	"Too Large."
 
 row			equ	3
 ;-------------------------------------------------------------------------------------
@@ -232,9 +255,9 @@ start32:
 	mov	dword [BOOT_PARAM_ADDR], BOOT_PARAM_MAGIC
 	mov		eax, [MemSize]
 	mov		[BOOT_PARAM_ADDR + 4], eax
-	mov		eax, KernelBinBase
+	mov		eax, KernelBinSeg
 	shl		eax, 4
-	add		eax, KernelBinOffset
+	add		eax, KernelBinOff
 	mov		[BOOT_PARAM_ADDR + 8], eax
 
 	jmp		SelectorFlatC:KernelPhyAddr
@@ -361,7 +384,7 @@ displayStr32:
 endline:
 	push	Endl
 	call	displayStr32
-	add	esp, 4
+	add		esp, 4
 
 	ret
 ;-------------------------------------------------------------------------------------

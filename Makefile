@@ -33,12 +33,13 @@ OBJS			=	kernel/kernel.o kernel/start.o kernel/i8259.o \
 					kernel/keyborad.o kernel/tty.o kernel/console.o \
 					kernel/systask.o kernel/message.o kernel/panic.o \
 					fs/main.o fs/misc.o fs/open.o fs/read_write.o \
-					fs/link.o \
-					mm/main.o mm/fork_exit.o 
+					fs/link.o fs/stat.o\
+					mm/main.o mm/fork_exit.o mm/exec.o
 LIBOBJS			=	lib/misc.o lib/klib.o lib/kliba.o lib/string.o \
 					lib/open.o lib/close.o lib/read.o lib/write.o\
 					lib/getpid.o lib/unlink.o lib/fork.o lib/exit.o\
-					lib/wait.o lib/printf.o lib/vsprintf.o lib/syscall.o 
+					lib/wait.o lib/printf.o lib/vsprintf.o lib/syscall.o \
+					lib/exec.o lib/stat.o
 DASMOUTPUT		=	kernel.bin.asm
 
 # image

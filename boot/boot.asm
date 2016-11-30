@@ -35,7 +35,7 @@ start:
 	int		13h
 
 ; find loader.bin
-%define StackBase LoaderBase
+%define StackBase LoaderSeg
 	mov	word [wSectorNo], SectorNoOfRootDirectory
 .begin:
 	cmp	word [wRootDirSizeForLoop], 0
@@ -43,15 +43,15 @@ start:
 
 	dec	word [wRootDirSizeForLoop]
 
-	mov		ax, LoaderBase
+	mov		ax, LoaderSeg
 	mov		es, ax	
-	mov		bx, LoaderOffset
+	mov		bx, LoaderOff
 	mov		ax, [wSectorNo]
 	mov		cl, 1
 	call	readSector
 
 	mov		si, loader
-	mov		di, LoaderOffset
+	mov		di, LoaderOff
 	cld
 	mov		dx, 10h
 .search:
@@ -92,9 +92,9 @@ start:
 	add		cx, ax
 	add		cx, DeltaSectorNo
 
-	mov		ax, LoaderBase
+	mov		ax, LoaderSeg
 	mov		es, ax	
-	mov		bx, LoaderOffset
+	mov		bx, LoaderOff
 	mov		ax, cx	
 .more:
 	mov		cl, 1
@@ -114,7 +114,7 @@ start:
 	mov		dh, 1
 	call	displayStr	
 
-	jmp		LoaderBase:LoaderOffset
+	jmp		LoaderSeg:LoaderOff
 ;-------------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------------

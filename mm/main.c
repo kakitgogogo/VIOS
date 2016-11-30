@@ -68,11 +68,9 @@ PUBLIC void task_mm()
 			do_exit(mm_msg.STATUS);
 			reply = FALSE;
 			break;
-		/*
 		case EXEC:
 			mm_msg.RETVAL = do_exec();
 			break;
-		*/
 		case WAIT:
 			do_wait();
 			reply= FALSE;

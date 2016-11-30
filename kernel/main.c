@@ -201,7 +201,7 @@ void untar(const char* filename)
 
 	printf("[Extract done]\n");
 }
-/*
+
 void shell(const char* tty_name)
 {
 	int fd_stdin = open(tty_name, O_RDWR);
@@ -270,7 +270,7 @@ void shell(const char* tty_name)
 	clode(fd_stdout);
 	close(fd_stdin);
 }
-*/
+
 void init()
 {
 	int fd_stdin = open("dev_tty1", O_RDWR);
@@ -310,6 +310,22 @@ void init()
 	}
 }
 
+void testA()
+{
+	while(1);
+}
+
+void testB()
+{
+	while(1);
+}
+
+void testC()
+{
+	while(1);
+}
+
+/*
 void testA()
 {
 	while(1)
@@ -398,3 +414,4 @@ void testC()
 
 	spin("Test C");
 }
+*/

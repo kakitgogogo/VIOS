@@ -1,17 +1,17 @@
-LoaderBase			equ	0x9000
-LoaderOffset		equ	0x100
-LoaderPhyAddr		equ	LoaderBase * 0x10
+LoaderSeg			equ	0x9000
+LoaderOff			equ	0x100
+LoaderPhyAddr		equ	LoaderSeg * 0x10
 
-KernelBinBase		equ	0x7000
-KernelBinOffset		equ	0x0
-KernelBinPhyAddr	equ	KernelBinBase * 0x10
+KernelBinSeg		equ	0x7000
+KernelBinOff		equ	0x0
+KernelBinPhyAddr	equ	KernelBinSeg * 0x10
 
 KernelPhyAddr		equ	0x1000
 
 PageDirBase			equ	100000h	
 PageTblBase			equ	101000h
 
-KERNEL_SPACE			equ	LoaderPhyAddr - KernelBinPhyAddr
+KERNEL_VALID_SPACE	equ	LoaderPhyAddr - KernelBinPhyAddr
 
 ; SuperBlock is stored at [0x700,0x900)
 SuperBlockBase		equ	0x70
