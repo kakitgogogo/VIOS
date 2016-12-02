@@ -14,7 +14,7 @@ PageTblBase			equ	101000h
 KERNEL_VALID_SPACE	equ	LoaderPhyAddr - KernelBinPhyAddr
 
 ; SuperBlock is stored at [0x700,0x900)
-SuperBlockBase		equ	0x70
+SUPER_BLK_SEG		equ	0x70
 
 BOOT_PARAM_ADDR		equ	0x900
 BOOT_PARAM_MAGIC		equ	0xB007

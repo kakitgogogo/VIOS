@@ -5,6 +5,7 @@
 
 #define	O_CREAT		1
 #define	O_RDWR		2
+#define	O_TRUNC		4
 
 #define	SEEK_SET		1
 #define	SEEK_CUR		2

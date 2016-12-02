@@ -202,27 +202,50 @@ PUBLIC int do_open()
 	int inode_id = search_file(pathname);
 
 	inode* inode_ptr = 0;
-	if(flags & O_CREAT)
+
+	if(inode_id == INVALID_INODE)
 	{
-		if(inode_id)
-		{
-			printk("[FS] file '%s' exists.\n", pathname);
-			return -1;
-		}
-		else
+		if(flags & O_CREAT)
 		{
 			inode_ptr = create_file(pathname, flags);
 		}
+		else
+		{
+			printk("[FS] file '%s' not exists.\n", pathname);
+			return -1;
+		}
 	}
-	else
+	else if(flags & O_RDWR)
 	{
-		assert(flags & O_RDWR);
+		if((flags & O_CREAT) && (!(flags & O_TRUNC)))
+		{
+			assert(flags == (O_RDWR | O_CREAT));
+			printk("[FS] file '%s' exists.\n", pathname);
+			return -1;
+		}
+		assert(	
+				(flags ==  O_RDWR) ||
+				(flags == (O_RDWR | O_TRUNC)) ||
+				(flags == (O_RDWR | O_TRUNC | O_CREAT))
+			    );
 
 		char filename[MAX_PATH];
-		inode* dir_inode;
+		inode *dir_inode;
 		if(strip_path(filename, pathname, &dir_inode) != 0)
 			return -1;
 		inode_ptr = get_inode(dir_inode->i_dev, inode_id);
+	}
+	else
+	{
+		printk("[FS] file '%s' exists.\n", pathname);
+		return -1;
+	}
+
+	if(flags & O_TRUNC)
+	{
+		assert(inode_ptr);
+		inode_ptr->i_size = 0;
+		sync_inode(inode_ptr);
 	}
 
 	if(inode_ptr)
@@ -268,17 +291,20 @@ PUBLIC int do_close()
 {
 	int fd = fs_msg.FD;
 	dec_inode(fs_caller->files[fd]->fd_inode);
-	fs_caller->files[fd]->fd_inode = 0;
+	if(--fs_caller->files[fd]->fd_cnt == 0)
+	{
+		fs_caller->files[fd]->fd_inode = 0;
+	}
 	fs_caller->files[fd] = 0;
 
 	return 0;
 }
 
-PUBLIC int do_lssek()
+PUBLIC int do_lseek()
 {
 	int fd = fs_msg.FD;
 	int off = fs_msg.OFFSET;
-	int whence = fs_msg.WHENCE;
+	int whence = fs_msg.WHENCE;   /* WHENCE:（到）…的地方 */
 
 	int pos = fs_caller->files[fd]->fd_pos;
 	int fsize = fs_caller->files[fd]->fd_inode->i_size;
@@ -297,6 +323,10 @@ PUBLIC int do_lssek()
 	default:
 		return -1;
 		break;
+	}
+	if((pos > fsize) || (pos < 0))
+	{
+		return -1;
 	}
 	fs_caller->files[fd]->fd_pos = pos;
 	return pos;

@@ -39,7 +39,7 @@ LIBOBJS			=	lib/misc.o lib/klib.o lib/kliba.o lib/string.o \
 					lib/open.o lib/close.o lib/read.o lib/write.o\
 					lib/getpid.o lib/unlink.o lib/fork.o lib/exit.o\
 					lib/wait.o lib/printf.o lib/vsprintf.o lib/syscall.o \
-					lib/exec.o lib/stat.o
+					lib/exec.o lib/stat.o lib/lseek.o
 DASMOUTPUT		=	kernel.bin.asm
 
 # image
@@ -183,6 +183,9 @@ lib/exec.o: lib/exec.c
 	$(CC) $(CFLAGS) -o $@ $<
 
 lib/stat.o: lib/stat.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+lib/lseek.o: lib/lseek.c
 	$(CC) $(CFLAGS) -o $@ $<
 
 

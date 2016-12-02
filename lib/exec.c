@@ -55,6 +55,19 @@ PUBLIC int execv(const char* pathname, char* argv[])
 		assert(stack_len + strlen(*p) + 1 < PROC_ORIGIN_STACK);
 		strcpy(&arg_stack[stack_len], *p);
 		stack_len += strlen(*p);
-		
+		arg_stack[stack_len] = 0;
+		++stack_len;		
 	}
+
+	MESSAGE msg;
+	msg.type = EXEC;
+	msg.PATHNAME = (void*)pathname;
+	msg.NAME_LEN = strlen(pathname);
+	msg.BUF = (void*)arg_stack;
+	msg.BUF_LEN = stack_len;
+
+	send_recv(BOTH, TASK_MM, &msg);
+	assert(msg.type == SYSCALL_RET);
+
+	return msg.RETVAL;
 }

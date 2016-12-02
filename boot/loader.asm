@@ -34,7 +34,7 @@ SelectorVideo		equ	LABEL_DESC_VIDEO - LABEL_GDT + SA_RPL3
 ;-------------------------------------------------------------------------------------
 
 ;-------------------------------------------------------------------------------------
-; Main
+; Start Loading
 ;-------------------------------------------------------------------------------------
 start:	
 	mov		ax, cs
@@ -45,7 +45,7 @@ start:
 
 ; show "Loading..."
 	mov		dh, 0
-	call	displayStr
+	call	disp_str
 
 ; get memory information
 	mov		ebx, 0
@@ -67,7 +67,7 @@ start:
 	mov	dword [MCRNumber16], 0
 .findkernel:
 
-; find kernel.bin
+; search kernel.bin
 %define StackBase KernelBinSeg
 	mov	word [wSectorNo], SectorNoOfRootDirectory
 	xor		ah, ah
@@ -84,7 +84,7 @@ start:
 	mov		bx, KernelBinOff
 	mov		ax, [wSectorNo]
 	mov		cl, 1
-	call	readSector
+	call	read_sector
 
 	mov		si, kernel
 	mov		di, KernelBinOff
@@ -116,7 +116,7 @@ start:
 	jmp		.begin
 .nokernel:
 	mov		dh, 2
-	call	displayStr	
+	call	disp_str	
 	jmp		$
 .found:	
 	mov		ax, RootDirSectors
@@ -131,7 +131,7 @@ start:
 	jmp		.valid
 .toolarge:
 	mov		dh, 3
-	call	displayStr
+	call	disp_str
 	jmp		$
 .valid:
 	add		di, 01Ah	
@@ -146,7 +146,7 @@ start:
 	mov		ax, cx	
 .more:
 	mov		cl, 1
-	call	readSector
+	call	read_sector
 	pop		ax			; 取出此 Sector 在 FAT 中的序号
 	call	getFAT
 	cmp		ax, 0FFFh
@@ -171,7 +171,7 @@ start:
 .finish:
 	call	killMotor
 	mov		dh, 1
-	call	displayStr
+	call	disp_str
 	
 ; jump to protect mode
 .jmp_pm:
@@ -208,7 +208,7 @@ msg3		db	"Too Large."
 row			equ	3
 ;-------------------------------------------------------------------------------------
 
-%include "utility.inc"
+%include "utils.inc"
 
 ;-------------------------------------------------------------------------------------
 ; function  killMotor

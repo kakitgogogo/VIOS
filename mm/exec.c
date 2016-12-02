@@ -64,7 +64,7 @@ PUBLIC int do_exec()
 	int delta = (int)origin_stack - (int)mm_msg.BUF;
 
 	int argc = 0;
-	if(origin_stack_len)
+	if(origin_stack_len)		/* change pointer array */
 	{
 		char** q = (char**)stackcopy;
 		for(; *q != 0; ++q, ++argc)

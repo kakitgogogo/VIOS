@@ -348,7 +348,14 @@ PRIVATE void fs_init()
 	assert(dd_map[MAJOR(ROOT_DEV)].driver_id != INVALID_DRIVER);
 	send_recv(BOTH, dd_map[MAJOR(ROOT_DEV)].driver_id, &driver_msg);
 
-	mkfs();
+	RD_SECT(ROOT_DEV, 1);
+
+	sb = (super_block*)fsbuf;
+	if(sb->magic != MAGIC_V1)
+	{
+		printk("[FS] mkfs\n");
+		mkfs();
+	}
 
 	read_super_block(ROOT_DEV);
 
@@ -431,8 +438,12 @@ PUBLIC void task_fs()
 		case EXIT:
 			fs_msg.RETVAL = fs_exit();
 			break;
+		case LSEEK:
+			fs_msg.RETVAL = do_lseek();
+			break;
 		case STAT:
 			fs_msg.RETVAL = do_stat();
+			break;
 		default:
 			dump_msg("FS::unknown message: ",&fs_msg);
 			assert(0);

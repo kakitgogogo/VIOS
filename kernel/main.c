@@ -162,14 +162,21 @@ void untar(const char* filename)
 
 	char buf[SECTOR_SIZE * 16];
 	int chunk = sizeof(buf);
+	int count = 0;
 
 	while(1)
 	{
-		read(fd, buf, SECTOR_SIZE);
+		assert(read(fd, buf, SECTOR_SIZE) == SECTOR_SIZE);
+
 		if(buf[0] == 0)
 		{
+			if(count == 0)
+			{
+				printf("[INIT] need not untar.\n");
+			}
 			break;
 		}
+		++count;
 
 		posix_tar_header* pth = (posix_tar_header*)buf;
 
@@ -181,10 +188,11 @@ void untar(const char* filename)
 		}
 
 		int bytes_left = file_size;
-		int fdout = open(pth->name, O_CREAT | O_RDWR);
+		int fdout = open(pth->name, O_CREAT | O_RDWR | O_TRUNC);
 		if(fdout == -1)
 		{
 			printf("[Extract failed]\n");
+			close(fd);
 			return;
 		}
 		printf("[Extract %s (%d bytes)]\n", pth->name, file_size);
@@ -192,11 +200,19 @@ void untar(const char* filename)
 		{
 			int bytes = min(chunk, bytes_left);
 			read(fd, buf, ((bytes - 1) / SECTOR_SIZE + 1) * SECTOR_SIZE);
-			write(fdout, buf, bytes);
+			assert(write(fdout, buf, bytes) == bytes);
 			bytes_left -= bytes;
 		}
 		close(fdout);
 	}
+
+	if(count)
+	{
+		lseek(fd, 0, SEEK_SET);
+		buf[0] = 0;
+		assert(write(fd, buf, 1) == 1);
+	}
+
 	close(fd);
 
 	printf("[Extract done]\n");
@@ -209,6 +225,12 @@ void shell(const char* tty_name)
 	int fd_stdout = open(tty_name, O_RDWR);
 	assert(fd_stdout == 1);
 
+#if 1
+	int child_pid = getpid();
+	printk("[SHELL] Child id: %d\n", child_pid);
+	printk("[SHELL] stdin: inode: %x\n", (&proc_table[child_pid])->files[fd_stdin]->fd_inode);
+	printk("[SHELL] stdout: inode: %x\n", (&proc_table[child_pid])->files[fd_stdout]->fd_inode);
+#endif
 	char rdbuf[128];
 
 	while(1)
@@ -247,8 +269,9 @@ void shell(const char* tty_name)
 		{
 			if(rdbuf[0])
 			{
-				write(fd_stdout, "Invalid command: ", 18);
+				write(fd_stdout, "Invalid Command: ", 17);
 				write(fd_stdout, rdbuf, r);
+				write(fd_stdout, "\n", 1);
 			}
 		}
 		else
@@ -273,33 +296,37 @@ void shell(const char* tty_name)
 
 void init()
 {
-	int fd_stdin = open("dev_tty1", O_RDWR);
+	int fd_stdin = open("/dev_tty1", O_RDWR);
 	assert(fd_stdin == 0);
-	int fd_stdout = open("dev_tty1", O_RDWR);
+	int fd_stdout = open("/dev_tty1", O_RDWR);
 	assert(fd_stdout == 1);
 
 	printf("[INIT] Init is running ...\n");
 	untar("/cmd.tar");
 
-	int pid = fork();
-#if 0
-	printk("init: stdin: inode: %x\n", (&proc_table[5])->files[fd_stdin]->fd_inode);
-	printk("init: stdout: inode: %x\n", (&proc_table[5])->files[fd_stdout]->fd_inode);
-#endif
-	if (pid != 0) 
-	{
-		printf("[INIT] Parent is running, child pid: %d\n", pid);
-		
-		int s;
-		int child = wait(&s);
+	char* tty_list[] = {
+		"/dev_tty2",
+		"/dev_tty3"
+	};
 
-		printf("[INIT] Child (%d) exited with status: %d.\n", child, s);
-	}
-	else 
+	int i;
+	for(i = 0; i < 2; ++i)
 	{
-		printf("[CHILD] Child is running, pid: %d\n", getpid());
-		
-		exit(123);
+		int pid = fork();
+
+		if (pid != 0) 
+		{
+			printf("[INIT] Parent is running, child pid: %d\n", pid);
+		}
+		else 
+		{
+			printf("[CHILD] Child is running, pid: %d\n", getpid());
+			close(fd_stdin);
+			close(fd_stdout);
+
+			shell(tty_list[i]);
+			assert(0);
+		}
 	}
 
 	while(1)
@@ -308,6 +335,8 @@ void init()
 		int child = wait(&s);
 		printf("[INIT] Child (%d) exited with status: %d.\n", child, s);
 	}
+
+	assert(0);
 }
 
 void testA()

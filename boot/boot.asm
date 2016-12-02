@@ -1,7 +1,7 @@
-	org		07c00h
+org		07c00h
 
 	jmp short start
-	nop
+	nop		; 这个 nop 不可少
 
 %include "fat12.inc"
 %include "load.inc"
@@ -9,7 +9,7 @@
 BaseOfStack		equ	07c00h
 
 ;-------------------------------------------------------------------------------------
-; Main
+; Start Booting
 ;-------------------------------------------------------------------------------------
 start:
 	mov		ax, cs
@@ -27,14 +27,14 @@ start:
 
 ; show "Booting..."
 	mov		dh, 0
-	call	displayStr
+	call	disp_str
 
 ; reset floppy
 	xor		ah, ah
 	xor		dl, dl
 	int		13h
 
-; find loader.bin
+; search loader.bin
 %define StackBase LoaderSeg
 	mov	word [wSectorNo], SectorNoOfRootDirectory
 .begin:
@@ -48,7 +48,7 @@ start:
 	mov		bx, LoaderOff
 	mov		ax, [wSectorNo]
 	mov		cl, 1
-	call	readSector
+	call	read_sector
 
 	mov		si, loader
 	mov		di, LoaderOff
@@ -80,7 +80,7 @@ start:
 	jmp		.begin
 .noloader:
 	mov		dh, 2
-	call	displayStr	
+	call	disp_str	
 	jmp		$
 .found:	
 	mov		ax, RootDirSectors
@@ -98,7 +98,7 @@ start:
 	mov		ax, cx	
 .more:
 	mov		cl, 1
-	call	readSector
+	call	read_sector
 	pop		ax	
 	call	getFAT
 	cmp		ax, 0FFFh
@@ -112,7 +112,7 @@ start:
 	jmp		.more
 .ok:
 	mov		dh, 1
-	call	displayStr	
+	call	disp_str	
 
 	jmp		LoaderSeg:LoaderOff
 ;-------------------------------------------------------------------------------------
@@ -133,7 +133,7 @@ msg2		db	"No LOADER "
 row			equ	0
 ;-------------------------------------------------------------------------------------
 
-%include "utility.inc"
+%include "utils.inc"
 
 ;----------------------------------------------------------------------------
 ; end

@@ -32,7 +32,7 @@ PUBLIC int do_stat()
 
 	inode* inode_ptr = 0;
 	inode* dir_inode;
-	assert(strip_path(filename, pathname, &dir_inode) != 0);
+	assert(strip_path(filename, pathname, &dir_inode) == 0);
 
 	inode_ptr = get_inode(dir_inode->i_dev, inode_id);
 
