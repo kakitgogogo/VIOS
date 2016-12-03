@@ -68,7 +68,7 @@ get_inode:
 	dec		eax
 	mov		bl, [fs:SB_INODE_SIZE]
 	mul		bl		; eax <- (inode_id - 1) * INODE_SIZE
-	mov		edx, SECTOR_BUF_SIZE
+	mov		edx, SECT_BUF_SIZE
 	sub		edx, dword [fs:SB_INODE_SIZE]
 	cmp		eax, edx
 	jg		err
@@ -82,7 +82,7 @@ get_inode:
 
 	pop		eax		; [es:ebx+eax] -> the inode
 
-	mov		edx, dword [fs:SB_INODE_SIZE_OFF]
+	mov		edx, dword [fs:SB_INODE_ISIZE_OFF]
 	add		edx, ebx
 	add		edx, eax
 	mov		ecx, [es:edx]		; [es:edx] -> the_inode.i_size

@@ -11,7 +11,7 @@ SECT_BUF_SIZE	equ	TRANS_SECT_NR * 512
 disk_address_packet:
 	db		0x10
 	db		0
-	dc		TRANS_SECT_NR
+	db		TRANS_SECT_NR
 	db		0
 	dw		0					; Destination Address Offset
 	dw		SUPER_BLK_SEG		; Destination Address Segment
@@ -82,7 +82,7 @@ start:
 	jge		.not_found
 
 	push	bx
-	mov		si, load
+	mov		si, loader
 	jmp		.str_cmp
 .not_found:
 	mov		dh, 2
@@ -113,10 +113,6 @@ start:
 ;-------------------------------------------------------------------------------------
 ; data
 ;-------------------------------------------------------------------------------------
-wRootDirSizeForLoop	dw	RootDirSectors
-wSectorNo	dw	0	
-isOdd		db	0	
-
 loader		db	"hdloader.bin", 0
 msgLen		equ	10
 msg0		db	"Booting..."	

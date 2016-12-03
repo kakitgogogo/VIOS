@@ -24,7 +24,8 @@ DASMFLAGS		=	-u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
 ARFLAGS			=	rcs
 
 # Object
-VIOSBOOT		=	boot/boot.bin boot/loader.bin
+VIOSBOOT		=	boot/boot.bin boot/loader.bin \
+					boot/hdboot.bin boot/hdloader.bin
 VIOSKERNEL		=	kernel.bin
 VIOSLIB			=	lib/vios_crt.a
 OBJS			=	kernel/kernel.o kernel/start.o kernel/i8259.o \
@@ -42,8 +43,10 @@ LIBOBJS			=	lib/misc.o lib/klib.o lib/kliba.o lib/string.o \
 					lib/exec.o lib/stat.o lib/lseek.o
 DASMOUTPUT		=	kernel.bin.asm
 
-# image
-VIOSIMAGE		=	vios.img
+# Floppy
+FD				=	vios.img
+# Hard Disk
+HD				=	80m.img
 
 # All Phony Targets
 .PHONY: 	bin image clean realclean disasm building
@@ -56,18 +59,22 @@ clean:
 		rm -f $(OBJS) $(LIBOBJS)
 
 final:
-		rm -f $(VIOSBOOT)
 		sudo umount $(MOUNTPOINT)
+
+allclean:
+		rm -f $(OBJS) $(LIBOBJS) $(VIOSBOOT) $(VIOSKERNEL) $(VIOSLIB)
 
 disasm:	
 		$(DASM) $(DASMFLAGS) $(VIOSKERNEL) > $(DASMOUTPUT)
 
 resetimg:
-		sudo dd if=/dev/zero of=$(VIOSIMAGE) bs=512 count=2880
+		sudo dd if=/dev/zero of=$(FD) bs=512 count=2880
 
 building:
-		sudo dd if=boot/boot.bin of=$(VIOSIMAGE) bs=512 count=1 conv=notrunc
-		sudo mount -o loop $(VIOSIMAGE) $(MOUNTPOINT)
+		sudo dd if=boot/boot.bin of=$(FD) bs=512 count=1 conv=notrunc
+		sudo dd if=boot/hdboot.bin of=$(HD) bs=1 count=446 conv=notrunc
+		sudo dd if=boot/hdboot.bin of=$(HD) seek=510 skip=510 bs=1 count=2 conv=notrunc
+		sudo mount -o loop $(FD) $(MOUNTPOINT)
 		sudo cp -fv boot/loader.bin $(MOUNTPOINT)
 		sudo cp -fv kernel.bin $(MOUNTPOINT)
 
@@ -76,6 +83,12 @@ boot/boot.bin:  boot/boot.asm
 	$(ASM) $(ASMBFLAGS) -o $@ $<
 
 boot/loader.bin: boot/loader.asm
+	$(ASM) $(ASMBFLAGS) -o $@ $<
+
+boot/hdboot.bin:  boot/hdboot.asm
+	$(ASM) $(ASMBFLAGS) -o $@ $<
+
+boot/hdloader.bin: boot/hdloader.asm
 	$(ASM) $(ASMBFLAGS) -o $@ $<
 
 

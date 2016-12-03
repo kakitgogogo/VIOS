@@ -13,7 +13,7 @@ disk_address_packet:
 	db		0x10
 	db		0
 sect_cnt:
-	dc		TRANS_SECT_NR
+	db		TRANS_SECT_NR
 	db		0
 	dw		KernelBinOff		; Destination Address Offset
 	dw		KernelBinSeg		; Destination Address Segment
@@ -90,7 +90,7 @@ start:
 
 ; search hdloader.bin
 	mov		si, kernel
-	push	bx
+	push	bx		; <- save
 .str_cmp:
 	add		bx, [fs:SB_DIR_ENT_FNAME_OFF]
 .chr_cmp:
@@ -108,10 +108,6 @@ start:
 	add		bx, [fs:SB_DIR_ENT_SIZE]
 	sub		ecx, [fs:SB_DIR_ENT_SIZE]
 	jz		.not_found
-
-	mov		dx, SECT_BUF_SIZE
-	cmp		bx, dx
-	jge		.not_found
 
 	push	bx
 	mov		si, kernel
@@ -132,7 +128,8 @@ start:
 	jl		.done
 	sub		ecx, SECT_BUF_SIZE
 	add	word [disk_address_packet + 4], SECT_BUF_SIZE
-	jc		err
+	jc		.upper64k
+	jmp		.jmp_load
 .upper64k:
 	add	word [disk_address_packet + 6], 1000h	; large than 64k(4k * 16), so seg + 4k
 .jmp_load:
@@ -163,12 +160,7 @@ start:
 ;-------------------------------------------------------------------------------------
 ; data
 ;-------------------------------------------------------------------------------------
-wRootDirSizeForLoop	dw	RootDirSectors
-wSectorNo			dw	0	
-isOdd				db	0	
-dwKernelSize		dd	0
-
-kernel		db	"KERNEL  BIN", 0
+kernel		db	"kernel.bin", 0
 msgLen		equ	10
 msg0		db	"Loading..."	
 msg1		db	"Done      "	
