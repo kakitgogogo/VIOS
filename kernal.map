@@ -220,7 +220,7 @@ LOAD lib/vios_crt.a
  *(.iplt)
  .iplt          0x0000000000000000        0x0 kernel/kernel.o
 
-.text           0x0000000000001000     0xaeaf
+.text           0x0000000000001000     0xaf3f
  *(.text.unlikely .text.*_unlikely)
  *(.text.exit .text.exit.*)
  *(.text.startup .text.startup.*)
@@ -307,196 +307,197 @@ LOAD lib/vios_crt.a
                 0x0000000000003b91                keyboard_handler
                 0x0000000000003c52                keyboard_read
  *fill*         0x0000000000004105        0x3 
- .text          0x0000000000004108      0xa1d kernel/tty.o
+ .text          0x0000000000004108      0xa61 kernel/tty.o
                 0x0000000000004108                tty_init
                 0x0000000000004555                task_tty
-                0x00000000000046cb                in_process
-                0x0000000000004819                sys_printx
-                0x00000000000049d8                dump_tty_buf
- *fill*         0x0000000000004b25        0x3 
- .text          0x0000000000004b28      0x8f8 kernel/console.o
-                0x0000000000004c2c                scroll_screen
-                0x0000000000004e7d                out_char
-                0x000000000000519f                screen_init
-                0x0000000000005338                is_current_console
-                0x000000000000535b                select_console
-                0x00000000000053b1                clear_console
- .text          0x0000000000005420      0x2cd kernel/systask.o
-                0x00000000000055e6                task_sys
- *fill*         0x00000000000056ed        0x3 
- .text          0x00000000000056f0     0x1884 kernel/message.o
-                0x00000000000056f0                reset_msg
-                0x00000000000066d2                sys_sendrec
-                0x0000000000006831                inform_int
-                0x00000000000069d3                dump_proc
-                0x0000000000006e2d                dump_msg
- .text          0x0000000000006f74       0x50 kernel/panic.o
-                0x0000000000006f74                panic
- .text          0x0000000000006fc4     0x11fb fs/main.o
-                0x0000000000006fc4                rw_sector
-                0x00000000000071a6                get_super_block
-                0x00000000000071ec                get_inode
-                0x000000000000735a                dec_inode
-                0x000000000000739f                sync_inode
-                0x00000000000074bc                new_inode
-                0x0000000000008079                task_fs
- *fill*         0x00000000000081bf        0x1 
- .text          0x00000000000081c0      0x205 fs/misc.o
-                0x00000000000081c0                strip_path
-                0x000000000000824c                search_file
- *fill*         0x00000000000083c5        0x3 
- .text          0x00000000000083c8      0xbd3 fs/open.o
-                0x00000000000089ae                do_open
-                0x0000000000008e7b                do_close
-                0x0000000000008eee                do_lseek
- *fill*         0x0000000000008f9b        0x1 
- .text          0x0000000000008f9c      0x590 fs/read_write.o
-                0x0000000000008f9c                do_rdwt
- .text          0x000000000000952c      0x8ce fs/link.o
-                0x000000000000952c                do_unlink
- *fill*         0x0000000000009dfa        0x2 
- .text          0x0000000000009dfc      0x1f1 fs/stat.o
-                0x0000000000009dfc                do_stat
- *fill*         0x0000000000009fed        0x3 
- .text          0x0000000000009ff0      0x1ce mm/main.o
-                0x000000000000a023                alloc_mem
-                0x000000000000a0ac                free_mem
-                0x000000000000a0b6                task_mm
- *fill*         0x000000000000a1be        0x2 
- .text          0x000000000000a1c0      0x7ac mm/fork_exit.o
-                0x000000000000a24c                do_fork
-                0x000000000000a5cb                do_exit
-                0x000000000000a831                do_wait
- .text          0x000000000000a96c      0x392 mm/exec.o
-                0x000000000000a96c                do_exec
- *fill*         0x000000000000acfe        0x2 
- .text          0x000000000000ad00      0x288 lib/vios_crt.a(misc.o)
-                0x000000000000ad00                send_recv
-                0x000000000000ade0                spin
-                0x000000000000adfb                assertion_failure
-                0x000000000000ae41                memcmp
-                0x000000000000aeb7                strcmp
-                0x000000000000af29                strcat
- .text          0x000000000000af88      0x387 lib/vios_crt.a(klib.o)
-                0x000000000000af88                get_boot_params
-                0x000000000000b028                get_kernel_map
-                0x000000000000b144                itoa
-                0x000000000000b1ef                disp_int
-                0x000000000000b214                disp_color_int
-                0x000000000000b240                delay
-                0x000000000000b286                dump
- *fill*         0x000000000000b30f        0x1 
- .text          0x000000000000b310      0x184 lib/vios_crt.a(kliba.o)
-                0x000000000000b310                disp_str
-                0x000000000000b34e                disp_color_str
-                0x000000000000b38d                out_byte
-                0x000000000000b399                in_byte
-                0x000000000000b3a3                enable_irq
-                0x000000000000b3c2                disable_irq
-                0x000000000000b3e1                enable_int
-                0x000000000000b3e3                disable_int
-                0x000000000000b3e5                port_read
-                0x000000000000b3f8                port_write
-                0x000000000000b40b                glitter
- *fill*         0x000000000000b494        0xc 
- .text          0x000000000000b4a0       0x78 lib/vios_crt.a(string.o)
-                0x000000000000b4a0                memcpy
-                0x000000000000b4c9                memset
-                0x000000000000b4ea                strcpy
-                0x000000000000b502                strlen
- .text          0x000000000000b518       0x73 lib/vios_crt.a(open.o)
-                0x000000000000b518                open
- *fill*         0x000000000000b58b        0x1 
- .text          0x000000000000b58c       0x33 lib/vios_crt.a(close.o)
-                0x000000000000b58c                close
- *fill*         0x000000000000b5bf        0x1 
- .text          0x000000000000b5c0       0x3f lib/vios_crt.a(read.o)
-                0x000000000000b5c0                read
- *fill*         0x000000000000b5ff        0x1 
- .text          0x000000000000b600       0x3f lib/vios_crt.a(write.o)
-                0x000000000000b600                write
- *fill*         0x000000000000b63f        0x1 
- .text          0x000000000000b640       0x59 lib/vios_crt.a(getpid.o)
-                0x000000000000b640                getpid
- *fill*         0x000000000000b699        0x3 
- .text          0x000000000000b69c       0x84 lib/vios_crt.a(fork.o)
-                0x000000000000b69c                fork
- .text          0x000000000000b720       0x44 lib/vios_crt.a(wait.o)
-                0x000000000000b720                wait
- .text          0x000000000000b764       0xdc lib/vios_crt.a(printf.o)
-                0x000000000000b764                printf
-                0x000000000000b7f1                printk
- .text          0x000000000000b840      0x31e lib/vios_crt.a(vsprintf.o)
-                0x000000000000b8a3                vsprintf
-                0x000000000000bb34                sprintf
- *fill*         0x000000000000bb5e        0x2 
- .text          0x000000000000bb60       0x38 lib/vios_crt.a(syscall.o)
-                0x000000000000bb60                get_ticks0
-                0x000000000000bb68                write0
-                0x000000000000bb78                printx
-                0x000000000000bb84                sendrec
- .text          0x000000000000bb98      0x263 lib/vios_crt.a(exec.o)
-                0x000000000000bb98                exec
-                0x000000000000bc13                execl
-                0x000000000000bc39                execv
- *fill*         0x000000000000bdfb        0x1 
- .text          0x000000000000bdfc       0x73 lib/vios_crt.a(stat.o)
-                0x000000000000bdfc                stat
- *fill*         0x000000000000be6f        0x1 
- .text          0x000000000000be70       0x3f lib/vios_crt.a(lseek.o)
-                0x000000000000be70                lseek
+                0x000000000000470f                in_process
+                0x000000000000485d                sys_printx
+                0x0000000000004a1c                dump_tty_buf
+ *fill*         0x0000000000004b69        0x3 
+ .text          0x0000000000004b6c      0x935 kernel/console.o
+                0x0000000000004c70                scroll_screen
+                0x0000000000004ec1                out_char
+                0x00000000000051e3                screen_init
+                0x000000000000537c                is_current_console
+                0x000000000000539f                select_console
+                0x00000000000053f5                clear_console
+ *fill*         0x00000000000054a1        0x3 
+ .text          0x00000000000054a4      0x2cd kernel/systask.o
+                0x000000000000566a                task_sys
+ *fill*         0x0000000000005771        0x3 
+ .text          0x0000000000005774     0x1884 kernel/message.o
+                0x0000000000005774                reset_msg
+                0x0000000000006756                sys_sendrec
+                0x00000000000068b5                inform_int
+                0x0000000000006a57                dump_proc
+                0x0000000000006eb1                dump_msg
+ .text          0x0000000000006ff8       0x50 kernel/panic.o
+                0x0000000000006ff8                panic
+ .text          0x0000000000007048     0x11fb fs/main.o
+                0x0000000000007048                rw_sector
+                0x000000000000722a                get_super_block
+                0x0000000000007270                get_inode
+                0x00000000000073de                dec_inode
+                0x0000000000007423                sync_inode
+                0x0000000000007540                new_inode
+                0x00000000000080fd                task_fs
+ *fill*         0x0000000000008243        0x1 
+ .text          0x0000000000008244      0x205 fs/misc.o
+                0x0000000000008244                strip_path
+                0x00000000000082d0                search_file
+ *fill*         0x0000000000008449        0x3 
+ .text          0x000000000000844c      0xbd3 fs/open.o
+                0x0000000000008a32                do_open
+                0x0000000000008eff                do_close
+                0x0000000000008f72                do_lseek
+ *fill*         0x000000000000901f        0x1 
+ .text          0x0000000000009020      0x590 fs/read_write.o
+                0x0000000000009020                do_rdwt
+ .text          0x00000000000095b0      0x8ce fs/link.o
+                0x00000000000095b0                do_unlink
+ *fill*         0x0000000000009e7e        0x2 
+ .text          0x0000000000009e80      0x1f1 fs/stat.o
+                0x0000000000009e80                do_stat
+ *fill*         0x000000000000a071        0x3 
+ .text          0x000000000000a074      0x1ce mm/main.o
+                0x000000000000a0a7                alloc_mem
+                0x000000000000a130                free_mem
+                0x000000000000a13a                task_mm
+ *fill*         0x000000000000a242        0x2 
+ .text          0x000000000000a244      0x7ac mm/fork_exit.o
+                0x000000000000a2d0                do_fork
+                0x000000000000a64f                do_exit
+                0x000000000000a8b5                do_wait
+ .text          0x000000000000a9f0      0x392 mm/exec.o
+                0x000000000000a9f0                do_exec
+ *fill*         0x000000000000ad82        0x2 
+ .text          0x000000000000ad84      0x288 lib/vios_crt.a(misc.o)
+                0x000000000000ad84                send_recv
+                0x000000000000ae64                spin
+                0x000000000000ae7f                assertion_failure
+                0x000000000000aec5                memcmp
+                0x000000000000af3b                strcmp
+                0x000000000000afad                strcat
+ .text          0x000000000000b00c      0x387 lib/vios_crt.a(klib.o)
+                0x000000000000b00c                get_boot_params
+                0x000000000000b0ac                get_kernel_map
+                0x000000000000b1c8                itoa
+                0x000000000000b273                disp_int
+                0x000000000000b298                disp_color_int
+                0x000000000000b2c4                delay
+                0x000000000000b30a                dump
+ *fill*         0x000000000000b393        0xd 
+ .text          0x000000000000b3a0      0x184 lib/vios_crt.a(kliba.o)
+                0x000000000000b3a0                disp_str
+                0x000000000000b3de                disp_color_str
+                0x000000000000b41d                out_byte
+                0x000000000000b429                in_byte
+                0x000000000000b433                enable_irq
+                0x000000000000b452                disable_irq
+                0x000000000000b471                enable_int
+                0x000000000000b473                disable_int
+                0x000000000000b475                port_read
+                0x000000000000b488                port_write
+                0x000000000000b49b                glitter
+ *fill*         0x000000000000b524        0xc 
+ .text          0x000000000000b530       0x78 lib/vios_crt.a(string.o)
+                0x000000000000b530                memcpy
+                0x000000000000b559                memset
+                0x000000000000b57a                strcpy
+                0x000000000000b592                strlen
+ .text          0x000000000000b5a8       0x73 lib/vios_crt.a(open.o)
+                0x000000000000b5a8                open
+ *fill*         0x000000000000b61b        0x1 
+ .text          0x000000000000b61c       0x33 lib/vios_crt.a(close.o)
+                0x000000000000b61c                close
+ *fill*         0x000000000000b64f        0x1 
+ .text          0x000000000000b650       0x3f lib/vios_crt.a(read.o)
+                0x000000000000b650                read
+ *fill*         0x000000000000b68f        0x1 
+ .text          0x000000000000b690       0x3f lib/vios_crt.a(write.o)
+                0x000000000000b690                write
+ *fill*         0x000000000000b6cf        0x1 
+ .text          0x000000000000b6d0       0x59 lib/vios_crt.a(getpid.o)
+                0x000000000000b6d0                getpid
+ *fill*         0x000000000000b729        0x3 
+ .text          0x000000000000b72c       0x84 lib/vios_crt.a(fork.o)
+                0x000000000000b72c                fork
+ .text          0x000000000000b7b0       0x44 lib/vios_crt.a(wait.o)
+                0x000000000000b7b0                wait
+ .text          0x000000000000b7f4       0xdc lib/vios_crt.a(printf.o)
+                0x000000000000b7f4                printf
+                0x000000000000b881                printk
+ .text          0x000000000000b8d0      0x31e lib/vios_crt.a(vsprintf.o)
+                0x000000000000b933                vsprintf
+                0x000000000000bbc4                sprintf
+ *fill*         0x000000000000bbee        0x2 
+ .text          0x000000000000bbf0       0x38 lib/vios_crt.a(syscall.o)
+                0x000000000000bbf0                get_ticks0
+                0x000000000000bbf8                write0
+                0x000000000000bc08                printx
+                0x000000000000bc14                sendrec
+ .text          0x000000000000bc28      0x263 lib/vios_crt.a(exec.o)
+                0x000000000000bc28                exec
+                0x000000000000bca3                execl
+                0x000000000000bcc9                execv
+ *fill*         0x000000000000be8b        0x1 
+ .text          0x000000000000be8c       0x73 lib/vios_crt.a(stat.o)
+                0x000000000000be8c                stat
+ *fill*         0x000000000000beff        0x1 
+ .text          0x000000000000bf00       0x3f lib/vios_crt.a(lseek.o)
+                0x000000000000bf00                lseek
  *(.gnu.warning)
 
 .fini
  *(SORT(.fini))
-                0x000000000000beaf                PROVIDE (__etext, .)
-                0x000000000000beaf                PROVIDE (_etext, .)
-                0x000000000000beaf                PROVIDE (etext, .)
+                0x000000000000bf3f                PROVIDE (__etext, .)
+                0x000000000000bf3f                PROVIDE (_etext, .)
+                0x000000000000bf3f                PROVIDE (etext, .)
 
-.rodata         0x000000000000bec0     0x1e32
+.rodata         0x000000000000bf40     0x1e32
  *(.rodata .rodata.* .gnu.linkonce.r.*)
- .rodata        0x000000000000bec0       0x2c kernel/start.o
- .rodata        0x000000000000beec       0x11 kernel/i8259.o
- *fill*         0x000000000000befd        0x3 
- .rodata        0x000000000000bf00        0x8 kernel/global.o
-                0x000000000000bf00                FSBUF_SIZE
-                0x000000000000bf04                MMBUF_SIZE
- *fill*         0x000000000000bf08       0x18 
- .rodata        0x000000000000bf20      0x290 kernel/protect.o
- .rodata        0x000000000000c1b0      0x25f kernel/main.o
- .rodata        0x000000000000c40f       0x1c kernel/proc.o
- *fill*         0x000000000000c42b        0x1 
- .rodata        0x000000000000c42c      0x1fc kernel/hd.o
- .rodata        0x000000000000c628       0x64 kernel/keyborad.o
- .rodata        0x000000000000c68c      0x15a kernel/tty.o
- *fill*         0x000000000000c7e6        0x2 
- .rodata        0x000000000000c7e8       0x81 kernel/console.o
- .rodata        0x000000000000c869       0x11 kernel/systask.o
- *fill*         0x000000000000c87a        0x2 
- .rodata        0x000000000000c87c      0x592 kernel/message.o
- .rodata        0x000000000000ce0e       0x10 kernel/panic.o
- *fill*         0x000000000000ce1e        0x2 
- .rodata        0x000000000000ce20      0x258 fs/main.o
- .rodata        0x000000000000d078      0x1df fs/open.o
- *fill*         0x000000000000d257        0x1 
- .rodata        0x000000000000d258      0x1ec fs/read_write.o
- .rodata        0x000000000000d444      0x18c fs/link.o
- .rodata        0x000000000000d5d0       0x8c fs/stat.o
- .rodata        0x000000000000d65c       0xb8 mm/main.o
- .rodata        0x000000000000d714      0x2b6 mm/fork_exit.o
- *fill*         0x000000000000d9ca        0x2 
- .rodata        0x000000000000d9cc       0xa6 mm/exec.o
- *fill*         0x000000000000da72        0x2 
- .rodata        0x000000000000da74       0xb7 lib/vios_crt.a(misc.o)
- *fill*         0x000000000000db2b        0x1 
- .rodata        0x000000000000db2c       0x85 lib/vios_crt.a(klib.o)
- .rodata        0x000000000000dbb1       0x23 lib/vios_crt.a(open.o)
- .rodata        0x000000000000dbd4       0x25 lib/vios_crt.a(getpid.o)
- .rodata        0x000000000000dbf9       0x33 lib/vios_crt.a(fork.o)
- .rodata        0x000000000000dc2c       0x19 lib/vios_crt.a(printf.o)
- *fill*         0x000000000000dc45        0x3 
- .rodata        0x000000000000dc48       0x87 lib/vios_crt.a(exec.o)
- .rodata        0x000000000000dccf       0x23 lib/vios_crt.a(stat.o)
+ .rodata        0x000000000000bf40       0x2c kernel/start.o
+ .rodata        0x000000000000bf6c       0x11 kernel/i8259.o
+ *fill*         0x000000000000bf7d        0x3 
+ .rodata        0x000000000000bf80        0x8 kernel/global.o
+                0x000000000000bf80                FSBUF_SIZE
+                0x000000000000bf84                MMBUF_SIZE
+ *fill*         0x000000000000bf88       0x18 
+ .rodata        0x000000000000bfa0      0x290 kernel/protect.o
+ .rodata        0x000000000000c230      0x25f kernel/main.o
+ .rodata        0x000000000000c48f       0x1c kernel/proc.o
+ *fill*         0x000000000000c4ab        0x1 
+ .rodata        0x000000000000c4ac      0x1fc kernel/hd.o
+ .rodata        0x000000000000c6a8       0x64 kernel/keyborad.o
+ .rodata        0x000000000000c70c      0x15a kernel/tty.o
+ *fill*         0x000000000000c866        0x2 
+ .rodata        0x000000000000c868       0x81 kernel/console.o
+ .rodata        0x000000000000c8e9       0x11 kernel/systask.o
+ *fill*         0x000000000000c8fa        0x2 
+ .rodata        0x000000000000c8fc      0x592 kernel/message.o
+ .rodata        0x000000000000ce8e       0x10 kernel/panic.o
+ *fill*         0x000000000000ce9e        0x2 
+ .rodata        0x000000000000cea0      0x258 fs/main.o
+ .rodata        0x000000000000d0f8      0x1df fs/open.o
+ *fill*         0x000000000000d2d7        0x1 
+ .rodata        0x000000000000d2d8      0x1ec fs/read_write.o
+ .rodata        0x000000000000d4c4      0x18c fs/link.o
+ .rodata        0x000000000000d650       0x8c fs/stat.o
+ .rodata        0x000000000000d6dc       0xb8 mm/main.o
+ .rodata        0x000000000000d794      0x2b6 mm/fork_exit.o
+ *fill*         0x000000000000da4a        0x2 
+ .rodata        0x000000000000da4c       0xa6 mm/exec.o
+ *fill*         0x000000000000daf2        0x2 
+ .rodata        0x000000000000daf4       0xb7 lib/vios_crt.a(misc.o)
+ *fill*         0x000000000000dbab        0x1 
+ .rodata        0x000000000000dbac       0x85 lib/vios_crt.a(klib.o)
+ .rodata        0x000000000000dc31       0x23 lib/vios_crt.a(open.o)
+ .rodata        0x000000000000dc54       0x25 lib/vios_crt.a(getpid.o)
+ .rodata        0x000000000000dc79       0x33 lib/vios_crt.a(fork.o)
+ .rodata        0x000000000000dcac       0x19 lib/vios_crt.a(printf.o)
+ *fill*         0x000000000000dcc5        0x3 
+ .rodata        0x000000000000dcc8       0x87 lib/vios_crt.a(exec.o)
+ .rodata        0x000000000000dd4f       0x23 lib/vios_crt.a(stat.o)
 
 .rodata1
  *(.rodata1)
@@ -504,78 +505,78 @@ LOAD lib/vios_crt.a
 .eh_frame_hdr
  *(.eh_frame_hdr)
 
-.eh_frame       0x000000000000dcf4     0x1320
+.eh_frame       0x000000000000dd74     0x1320
  *(.eh_frame)
- .eh_frame      0x000000000000dcf4       0x38 kernel/start.o
- .eh_frame      0x000000000000dd2c       0x60 kernel/i8259.o
+ .eh_frame      0x000000000000dd74       0x38 kernel/start.o
+ .eh_frame      0x000000000000ddac       0x60 kernel/i8259.o
                                          0x78 (size before relaxing)
- .eh_frame      0x000000000000dd8c       0xb0 kernel/protect.o
+ .eh_frame      0x000000000000de0c       0xb0 kernel/protect.o
                                          0xc8 (size before relaxing)
- .eh_frame      0x000000000000de3c       0xe8 kernel/main.o
+ .eh_frame      0x000000000000debc       0xe8 kernel/main.o
                                         0x100 (size before relaxing)
- .eh_frame      0x000000000000df24       0x60 kernel/clock.o
+ .eh_frame      0x000000000000dfa4       0x60 kernel/clock.o
                                          0x78 (size before relaxing)
- .eh_frame      0x000000000000df84       0xc0 kernel/proc.o
+ .eh_frame      0x000000000000e004       0xc0 kernel/proc.o
                                          0xd8 (size before relaxing)
- .eh_frame      0x000000000000e044      0x210 kernel/hd.o
+ .eh_frame      0x000000000000e0c4      0x210 kernel/hd.o
                                         0x228 (size before relaxing)
- .eh_frame      0x000000000000e254       0xe0 kernel/keyborad.o
+ .eh_frame      0x000000000000e2d4       0xe0 kernel/keyborad.o
                                          0xf8 (size before relaxing)
- .eh_frame      0x000000000000e334      0x13c kernel/tty.o
+ .eh_frame      0x000000000000e3b4      0x13c kernel/tty.o
                                         0x154 (size before relaxing)
- .eh_frame      0x000000000000e470      0x168 kernel/console.o
+ .eh_frame      0x000000000000e4f0      0x168 kernel/console.o
                                         0x180 (size before relaxing)
- .eh_frame      0x000000000000e5d8       0x5c kernel/systask.o
+ .eh_frame      0x000000000000e658       0x5c kernel/systask.o
                                          0x74 (size before relaxing)
- .eh_frame      0x000000000000e634      0x160 kernel/message.o
+ .eh_frame      0x000000000000e6b4      0x160 kernel/message.o
                                         0x178 (size before relaxing)
- .eh_frame      0x000000000000e794       0x20 kernel/panic.o
+ .eh_frame      0x000000000000e814       0x20 kernel/panic.o
                                          0x38 (size before relaxing)
- .eh_frame      0x000000000000e7b4      0x194 fs/main.o
+ .eh_frame      0x000000000000e834      0x194 fs/main.o
                                         0x1ac (size before relaxing)
- .eh_frame      0x000000000000e948       0x48 fs/misc.o
+ .eh_frame      0x000000000000e9c8       0x48 fs/misc.o
                                          0x60 (size before relaxing)
- .eh_frame      0x000000000000e990      0x108 fs/open.o
+ .eh_frame      0x000000000000ea10      0x108 fs/open.o
                                         0x120 (size before relaxing)
- .eh_frame      0x000000000000ea98       0x2c fs/read_write.o
+ .eh_frame      0x000000000000eb18       0x2c fs/read_write.o
                                          0x44 (size before relaxing)
- .eh_frame      0x000000000000eac4       0x2c fs/link.o
+ .eh_frame      0x000000000000eb44       0x2c fs/link.o
                                          0x44 (size before relaxing)
- .eh_frame      0x000000000000eaf0       0x28 fs/stat.o
+ .eh_frame      0x000000000000eb70       0x28 fs/stat.o
                                          0x40 (size before relaxing)
- .eh_frame      0x000000000000eb18       0x7c mm/main.o
+ .eh_frame      0x000000000000eb98       0x7c mm/main.o
                                          0x94 (size before relaxing)
- .eh_frame      0x000000000000eb94       0x90 mm/fork_exit.o
+ .eh_frame      0x000000000000ec14       0x90 mm/fork_exit.o
                                          0xa8 (size before relaxing)
- .eh_frame      0x000000000000ec24       0x2c mm/exec.o
+ .eh_frame      0x000000000000eca4       0x2c mm/exec.o
                                          0x44 (size before relaxing)
- .eh_frame      0x000000000000ec50       0xbc lib/vios_crt.a(misc.o)
+ .eh_frame      0x000000000000ecd0       0xbc lib/vios_crt.a(misc.o)
                                          0xd4 (size before relaxing)
- .eh_frame      0x000000000000ed0c       0xe0 lib/vios_crt.a(klib.o)
+ .eh_frame      0x000000000000ed8c       0xe0 lib/vios_crt.a(klib.o)
                                          0xf8 (size before relaxing)
- .eh_frame      0x000000000000edec       0x20 lib/vios_crt.a(open.o)
+ .eh_frame      0x000000000000ee6c       0x20 lib/vios_crt.a(open.o)
                                          0x38 (size before relaxing)
- .eh_frame      0x000000000000ee0c       0x20 lib/vios_crt.a(close.o)
+ .eh_frame      0x000000000000ee8c       0x20 lib/vios_crt.a(close.o)
                                          0x38 (size before relaxing)
- .eh_frame      0x000000000000ee2c       0x20 lib/vios_crt.a(read.o)
+ .eh_frame      0x000000000000eeac       0x20 lib/vios_crt.a(read.o)
                                          0x38 (size before relaxing)
- .eh_frame      0x000000000000ee4c       0x20 lib/vios_crt.a(write.o)
+ .eh_frame      0x000000000000eecc       0x20 lib/vios_crt.a(write.o)
                                          0x38 (size before relaxing)
- .eh_frame      0x000000000000ee6c       0x20 lib/vios_crt.a(getpid.o)
+ .eh_frame      0x000000000000eeec       0x20 lib/vios_crt.a(getpid.o)
                                          0x38 (size before relaxing)
- .eh_frame      0x000000000000ee8c       0x20 lib/vios_crt.a(fork.o)
+ .eh_frame      0x000000000000ef0c       0x20 lib/vios_crt.a(fork.o)
                                          0x38 (size before relaxing)
- .eh_frame      0x000000000000eeac       0x20 lib/vios_crt.a(wait.o)
+ .eh_frame      0x000000000000ef2c       0x20 lib/vios_crt.a(wait.o)
                                          0x38 (size before relaxing)
- .eh_frame      0x000000000000eecc       0x40 lib/vios_crt.a(printf.o)
+ .eh_frame      0x000000000000ef4c       0x40 lib/vios_crt.a(printf.o)
                                          0x58 (size before relaxing)
- .eh_frame      0x000000000000ef0c       0x68 lib/vios_crt.a(vsprintf.o)
+ .eh_frame      0x000000000000ef8c       0x68 lib/vios_crt.a(vsprintf.o)
                                          0x80 (size before relaxing)
- .eh_frame      0x000000000000ef74       0x60 lib/vios_crt.a(exec.o)
+ .eh_frame      0x000000000000eff4       0x60 lib/vios_crt.a(exec.o)
                                          0x78 (size before relaxing)
- .eh_frame      0x000000000000efd4       0x20 lib/vios_crt.a(stat.o)
+ .eh_frame      0x000000000000f054       0x20 lib/vios_crt.a(stat.o)
                                          0x38 (size before relaxing)
- .eh_frame      0x000000000000eff4       0x20 lib/vios_crt.a(lseek.o)
+ .eh_frame      0x000000000000f074       0x20 lib/vios_crt.a(lseek.o)
                                          0x38 (size before relaxing)
 
 .gcc_except_table
@@ -583,7 +584,7 @@ LOAD lib/vios_crt.a
 
 .exception_ranges
  *(.exception_ranges .exception_ranges*)
-                0x000000000000f014                . = (ALIGN (0x1000) - ((0x1000 - .) & 0xfff))
+                0x000000000000f094                . = (ALIGN (0x1000) - ((0x1000 - .) & 0xfff))
                 0x0000000000011000                . = DATA_SEGMENT_ALIGN (0x1000, 0x1000)
 
 .eh_frame

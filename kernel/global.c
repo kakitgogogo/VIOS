@@ -51,8 +51,8 @@ PUBLIC	DRIVER		dd_map[]={
 	{INVALID_DRIVER}
 };
 
-PUBLIC	u8*			fsbuf		= (u8*)0x600000;
-PUBLIC	const int	FSBUF_SIZE	= 0x100000;
+PUBLIC	u8*			fsbuf		= (u8*)0x600000;	/* 6M */
+PUBLIC	const int	FSBUF_SIZE	= 0x100000;		/* 1M */
 
-PUBLIC	u8*			mmbuf		= (u8*)0x700000;
-PUBLIC	const int	MMBUF_SIZE	= 0x100000;
+PUBLIC	u8*			mmbuf		= (u8*)0x700000;	/* 7M */
+PUBLIC	const int	MMBUF_SIZE	= 0x100000;		/* 1M */

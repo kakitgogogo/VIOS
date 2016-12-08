@@ -166,6 +166,12 @@ PUBLIC void task_tty()
 		case DEV_WRITE:
 			tty_do_write(tty, &msg);
 			break;
+		case DEV_CLEAR:
+			clear_console();
+			reset_msg(&msg);
+			msg.type = SYSCALL_RET;
+			send_recv(SEND, src, &msg);
+			break;
 		case HARD_INT:
 			key_pressed = FALSE;
 			continue;

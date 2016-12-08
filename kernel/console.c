@@ -246,15 +246,16 @@ PUBLIC void select_console(int console_id)
 	set_video_start_addr(console_table[console_id].current_start_addr);
 }
 
-PUBLIC void clear_console(int console_id)
+PUBLIC void clear_console()
 {
-	CONSOLE *console = &console_table[console_id];
-
+	CONSOLE *console = &console_table[current_console_id];
 	console->cursor = console->original_addr;
-	for(; console->cursor < console->original_addr + console->console_size - 1; )
-	{
-		out_char(console, ' ');
-	}
 
-	screen_init(&tty_table[console_id]);
+	clear_screen(console->cursor, console->console_size);
+
+	out_char(console, 'T');
+	out_char(console, 'T');
+	out_char(console, 'Y');
+	out_char(console, current_console_id + '1');
+	out_char(console, '\n');
 }

@@ -5,6 +5,16 @@
 #define	PUBLIC
 #define	PRIVATE	static
 
+/* EXTERN */
+#define	EXTERN	extern
+
+/* Boolean */
+typedef enum
+{
+	FALSE,
+	TRUE
+}bool;
+
 typedef	unsigned long long	u64;
 typedef	unsigned int			u32;
 typedef	unsigned short		u16;

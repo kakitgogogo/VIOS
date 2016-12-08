@@ -33,16 +33,6 @@ void assertion_failure(char *exp, char *file, char *base_file, int line);
 #define	max(a, b)	((a) > (b) ? (a) : (b))
 #define	min(a, b)	((a) < (b) ? (a) : (b))
 
-/* EXTERN */
-#define	EXTERN	extern
-
-/* Boolean */
-typedef enum
-{
-	FALSE,
-	TRUE
-}bool;
-
 /* Color */
 #define	BLACK	0x0
 #define	WHITE	0x7
@@ -194,6 +184,7 @@ enum msgtype
 	DEV_READ,
 	DEV_WRITE,
 	DEV_IOCTL,
+	DEV_CLEAR,
 
 	DISK_LOG
 };

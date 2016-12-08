@@ -120,10 +120,7 @@ PUBLIC void delay(int time)
 	{
 		for(i = 0; i < 10; ++i)
 		{
-			for(j = 0; j < 10000; ++j)
-			{
-				
-			}
+			for(j = 0; j < 10000; ++j);
 		}
 	}
 }
