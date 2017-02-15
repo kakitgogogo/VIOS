@@ -12,7 +12,7 @@ CFLAGS		=	-I ../include/ -c -fno-builtin -fno-stack-protector -m32 -Wall
 LDFLAGS		=	-Ttext 0x1000 -m elf_i386
 DASMFLAGS	=	-D
 LIB			=	../lib/vios_crt.a
-BIN			=	echo pwd clear ls cat edit
+BIN			=	echo pwd clear ls cat edit rm shut reboot
 
 .PHONY: bin clean install all
 
@@ -66,4 +66,22 @@ edit.o: edit.c
 	$(CC) $(CFLAGS) -o $@ $<
 
 edit: edit.o start.o $(LIB)
+	$(LD) $(LDFLAGS) -o $@ $?
+
+rm.o: rm.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+rm: rm.o start.o $(LIB)
+	$(LD) $(LDFLAGS) -o $@ $?
+
+shut.o: shut.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+shut: shut.o start.o $(LIB)
+	$(LD) $(LDFLAGS) -o $@ $?
+
+reboot.o: reboot.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+reboot: reboot.o start.o $(LIB)
 	$(LD) $(LDFLAGS) -o $@ $?

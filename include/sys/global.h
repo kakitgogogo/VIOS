@@ -6,6 +6,17 @@
 #define	EXTERN
 #endif
 
+#include "bitmap.h"
+#include "const.h"
+#include "type.h"
+#include "protect.h"
+#include "string.h"
+#include "tty.h"
+#include "console.h"
+#include "fs.h"
+#include "proc.h"
+#include "sched.h"
+
 EXTERN	int			ticks;
 
 EXTERN	int 			disp_pos;
@@ -37,6 +48,10 @@ extern	system_call	sys_call_table[];
 extern	TTY			tty_table[];
 extern	CONSOLE		console_table[];
 
+EXTERN	u8			prio_array_1[MAX_PRIO / 8 + 1];
+EXTERN	u8			prio_array_2[MAX_PRIO / 8 + 1];
+EXTERN	runqueue_t	runqueue;
+
 /* File System */
 EXTERN	file_desc	fd_table[NR_FILE_DESC];
 EXTERN	inode		inode_table[NR_INODE];
@@ -53,5 +68,10 @@ EXTERN	MESSAGE		mm_msg;
 extern	u8 *			mmbuf;
 extern	const int	MMBUF_SIZE;
 EXTERN	int			memory_size;
+
+extern	bool		isInited;
+extern	bool		isPreemptDisabled;
+
+extern	u8*			global_bitmap;
 
 #endif

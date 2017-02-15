@@ -9,35 +9,9 @@
 #include "global.h"
 #include "proto.h"
 
-PUBLIC void schedule()
+PUBLIC PROCESS* current()
 {
-	PROCESS *p;
-	int greatest_ticks = 0;
-
-	while(!greatest_ticks)
-	{
-		for(p = &FIRST_PROC; p <= &LAST_PROC; ++p)
-		{
-			if(p->pflags == 0)
-			{
-				if(p->ticks > greatest_ticks)
-				{
-					greatest_ticks = p->ticks;
-					proc_ready = p;
-				}
-			}
-		}
-		if(!greatest_ticks)
-		{
-			for(p = &FIRST_PROC; p <= &LAST_PROC; ++p)
-			{
-				if(p->pflags == 0)
-				{
-					p->ticks = p->priority;
-				}
-			}
-		}
-	}
+	return proc_ready;
 }
 
 PUBLIC int sys_get_ticks()
@@ -84,4 +58,14 @@ PUBLIC void tty_write(TTY* tty, char* buf, int len)
 		out_char(tty->console, *p++);
 		--i;
 	}
+}
+
+PUBLIC void proc_info(PROCESS* proc)
+{
+	printk("\nPROCESS %s(%d) INFO:\n", proc->pname, proc->pid);
+	printk("\tldt_selector: 0x%x\n", proc->ldt_selector);
+	printk("\tprio: 0x%x\n", proc->prio);
+	printk("\ttime_slice: %dms\n", proc->time_slice);
+	printk("\ttimestamp: 0x%x\n", proc->timestamp);
+	printk("\tinteractive_credit: 0x%x\n", proc->interactive_credit);
 }

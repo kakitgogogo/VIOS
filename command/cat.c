@@ -11,7 +11,8 @@ int main(int argc, char* argv[])
 	int fin = open(argv[1], O_RDWR);
 	if(fin == -1)
 	{
-		printf("Failed to open %s", argv[1]);
+		printf("Failed to open %s\n", argv[1]);
+		return 1;
 	}
 	char rdbuf[128];
 

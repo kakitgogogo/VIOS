@@ -10,6 +10,7 @@
 #include "proto.h"
 #include "keyboard.h"
 #include "stdio.h"
+#include "sched.h"
 
 PRIVATE void cleanup(PROCESS* proc)
 {
@@ -20,6 +21,8 @@ PRIVATE void cleanup(PROCESS* proc)
 	send_recv(SEND, proc->parent, &msg);
 
 	proc->pflags = FREE_SLOT;
+
+	deactivate_task(&proc, this_rq());
 
 	printk("[MM] do_exit :: %s (%d) has been cleaned up.\n", proc->pname, proc2pid(proc));
 }
@@ -87,6 +90,8 @@ PUBLIC int do_fork()
 
 	memcpy((void*)child_base, (void*)T_base, T_size);
 
+	printk("%s->time_slice: %dms, prio: %d\n", proc->pname, proc->time_slice, proc->prio);
+
 	init_descriptor(&proc->ldts[INDEX_LDT_C], 
 		child_base,
 		(PROC_SIZE_DEFAULT - 1) >> LIMIT_4K_SHIFT,
@@ -102,6 +107,7 @@ PUBLIC int do_fork()
 	msg2fs.type = FORK;
 	msg2fs.PID = child_pid;
 	send_recv(BOTH, TASK_FS, &msg2fs);
+
 #if 0
 	printk("init: stdin: fd_cnt: %d\n", (&proc_table[5])->files[0]->fd_cnt);
 	printk("init: stdout: fd_cnt: %d\n", (&proc_table[5])->files[1]->fd_cnt);
@@ -112,8 +118,13 @@ PUBLIC int do_fork()
 	printk("child: stdin: %x\n", (&proc_table[child_pid])->files[0]);
 	printk("child: stdout: %x\n", (&proc_table[child_pid])->files[1]);
 #endif
+	/* child PID will be returned to the parent proc */
 	mm_msg.PID = child_pid;
 
+	activate_task(proc, this_rq());
+	printk("%s->time_slice: %dms, prio: %d\n", proc->pname, proc->time_slice, proc->prio);
+
+	/* to child */
 	MESSAGE msg2child;
 	msg2child.type = SYSCALL_RET;
 	msg2child.RETVAL = 0;

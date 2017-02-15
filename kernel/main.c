@@ -10,6 +10,8 @@
 #include "proto.h"
 #include "keyboard.h"
 #include "stdio.h"
+#include "sched.h"
+#include "list.h"
 
 PUBLIC int kernel_main()
 {
@@ -23,7 +25,7 @@ PUBLIC int kernel_main()
 	u8 priv, rpl;
 	u32 eflags, prio;
 
-	int tty_ids[NR_TASKS + NR_NATIVE_PROCS] = {0, 0, 0, 0, 0, 0, 1, 2, 0};
+	int tty_ids[NR_TASKS + NR_NATIVE_PROCS] = {0, 0, 0, 0, 0, 0};
 
 	for(i = 0; i < NR_TASKS + NR_PROCS; ++i, ++proc, ++task)
 	{
@@ -38,7 +40,7 @@ PUBLIC int kernel_main()
 			priv = PRIVILEGE_TASK;
 			rpl = RPL_TASK;
 			eflags = 0x1202;
-			prio = 15;
+			prio = 120;
 		}
 		else
 		{
@@ -46,7 +48,7 @@ PUBLIC int kernel_main()
 			priv = PRIVILEGE_USER;
 			rpl = RPL_USER;
 			eflags = 0x202;
-			prio = 5;
+			prio = 130;
 		}
 		strcpy(proc->pname, task->name);
 
@@ -89,7 +91,16 @@ PUBLIC int kernel_main()
 		proc->regs.esp = (u32)(stack_top);
 		proc->regs.eflags = eflags;
 
-		proc->ticks = proc->priority = prio;
+		proc->prio = prio;
+		proc->static_prio = prio;
+		proc->time_slice = BASE_TIMESLICE(proc);
+
+		list_init(&proc->run_list);
+		proc->sleep_avg = 0;
+		proc->timestamp = 0;
+		proc->activated = 0;
+		proc->interactive_credit = 0;
+		proc->array = NULL;
 
 		proc->pflags = 0;
 		proc->pmsg = 0;
@@ -116,6 +127,7 @@ PUBLIC int kernel_main()
 
 	clock_init();
 	keyboard_init();
+	sched_init();
 
 	restart();
 
@@ -225,7 +237,7 @@ void shell(const char* tty_name)
 	int fd_stdout = open(tty_name, O_RDWR);
 	assert(fd_stdout == 1);
 
-#if 1
+#if 0
 	int child_pid = getpid();
 	printk("[SHELL] Child id: %d\n", child_pid);
 	printk("[SHELL] stdin: inode: %x\n", (&proc_table[child_pid])->files[fd_stdin]->fd_inode);
@@ -290,7 +302,7 @@ void shell(const char* tty_name)
 		}
 	}
 
-	clode(fd_stdout);
+	close(fd_stdout);
 	close(fd_stdin);
 }
 
@@ -303,6 +315,9 @@ void init()
 
 	printf("[INIT] Init is running ...\n");
 	untar("/cmd.tar");
+
+	//printf("bm: len: %d\n", global_bitmap->bytes_len);
+	//test_bitmap();
 
 	char* tty_list[] = {
 		"/dev_tty2",
@@ -339,17 +354,7 @@ void init()
 	assert(0);
 }
 
-void testA()
-{
-	while(1);
-}
-
-void testB()
-{
-	while(1);
-}
-
-void testC()
+void test()
 {
 	while(1);
 }

@@ -9,6 +9,7 @@
 #include "proc.h"
 #include "global.h"
 #include "proto.h"
+#include "atomic.h"
 
 #define DRV_OF_DEV(dev) (dev <= MAX_PRIM ? dev / NR_PRIM_PER_DRIVER : (dev - MINOR_HD1A) / NR_SUB_PER_DRIVER)
 
@@ -341,6 +342,8 @@ PUBLIC void task_hd()
 
 	hd_init();
 
+	test_in_kernel();
+
 	while(1)
 	{
 		send_recv(RECEIVE, ANY, &msg);
@@ -377,4 +380,20 @@ PUBLIC void hd_handler(int irq)
 	hd_status = in_byte(REG_STATUS);
 
 	inform_int(TASK_HD);
+}
+
+
+/* Because some test cases can only be carried out in the kernel, so choose to test here */
+void test_in_kernel()  
+{
+	//test_bitmap();
+	//test_list();
+
+	atomic_t a;
+	atomic_set(&a, 0);
+	atomic_inc(&a);
+	atomic_add(&a, 4);
+	printk("atomic counter: %d\n", atomic_get(&a));
+
+	test_sched();
 }

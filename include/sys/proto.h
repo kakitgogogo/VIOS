@@ -15,6 +15,8 @@ PUBLIC void	port_write(u16 port, void* buf, int n);
 PUBLIC void	glitter(int row, int col);
 
 /* lib/klib.c */
+PUBLIC void get_boot_params(boot_params* bp);
+PUBLIC int get_kernel_map(unsigned int* base, unsigned int* limit);
 PUBLIC void	delay(int time);
 PUBLIC void	disp_int(int input);
 PUBLIC char*	itoa(char* str, int num);
@@ -53,9 +55,7 @@ PUBLIC void	sys_call();
 
 /* kernel/main.c */
 PUBLIC void	init();
-PUBLIC void	testA();
-PUBLIC void	testB();
-PUBLIC void	testC();
+PUBLIC void	test();
 
 /* kernel/clock.c */
 PUBLIC void	clock_init();

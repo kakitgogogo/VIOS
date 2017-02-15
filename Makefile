@@ -18,7 +18,7 @@ AR				=	ar
 
 ASMBFLAGS		=	-I boot/include/
 ASMKFLAGS		=	-I include/ -I include/sys/ -f elf
-CFLAGS			=	-I include/ -I include/sys/ -c -fno-builtin -m32 -Wall
+CFLAGS			=	-I include/ -I include/sys/ -c -fno-builtin -m32 -Wall -fno-stack-protector
 LDFLAGS			=	-s -Ttext $(ENTRYPOINT) -m elf_i386 -Map kernal.map
 DASMFLAGS		=	-u -o $(ENTRYPOINT) -e $(ENTRYOFFSET)
 ARFLAGS			=	rcs
@@ -30,17 +30,19 @@ VIOSKERNEL		=	kernel.bin
 VIOSLIB			=	lib/vios_crt.a
 OBJS			=	kernel/kernel.o kernel/start.o kernel/i8259.o \
 					kernel/global.o kernel/protect.o kernel/main.o \
-					kernel/clock.o kernel/proc.o kernel/hd.o \
+					kernel/clock.o kernel/proc.o kernel/hd.o kernel/sched.o\
 					kernel/keyborad.o kernel/tty.o kernel/console.o \
 					kernel/systask.o kernel/message.o kernel/panic.o \
 					fs/main.o fs/misc.o fs/open.o fs/read_write.o \
 					fs/link.o fs/stat.o\
-					mm/main.o mm/fork_exit.o mm/exec.o
+					mm/main.o mm/fork_exit.o mm/exec.o\
+					test/test_bitmap.o test/test_list.o test/test_sched.o
 LIBOBJS			=	lib/misc.o lib/klib.o lib/kliba.o lib/string.o \
 					lib/open.o lib/close.o lib/read.o lib/write.o\
 					lib/getpid.o lib/unlink.o lib/fork.o lib/exit.o\
 					lib/wait.o lib/printf.o lib/vsprintf.o lib/syscall.o \
-					lib/exec.o lib/stat.o lib/lseek.o lib/clear.o
+					lib/exec.o lib/stat.o lib/lseek.o lib/clear.o lib/utils.o\
+					lib/bitmap.o
 DASMOUTPUT		=	kernel.bin.asm
 
 # Floppy
@@ -143,6 +145,9 @@ kernel/message.o: kernel/message.c
 kernel/hd.o: kernel/hd.c
 	$(CC) $(CFLAGS) -o $@ $<
 
+kernel/sched.o: kernel/sched.c
+	$(CC) $(CFLAGS) -o $@ $<
+
 
 lib/klib.o: lib/klib.c
 	$(CC) $(CFLAGS) -o $@ $<
@@ -204,6 +209,12 @@ lib/lseek.o: lib/lseek.c
 lib/clear.o: lib/clear.c
 	$(CC) $(CFLAGS) -o $@ $<
 
+lib/utils.o: lib/utils.asm
+	$(ASM) $(ASMKFLAGS) -o $@ $<
+
+lib/bitmap.o: lib/bitmap.c
+	$(CC) $(CFLAGS) -o $@ $<
+
 
 fs/main.o: fs/main.c
 	$(CC) $(CFLAGS) -o $@ $<
@@ -231,4 +242,14 @@ mm/fork_exit.o: mm/fork_exit.c
 	$(CC) $(CFLAGS) -o $@ $<
 
 mm/exec.o: mm/exec.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+
+test/test_bitmap.o: test/test_bitmap.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+test/test_list.o: test/test_list.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+test/test_sched.o: test/test_sched.c
 	$(CC) $(CFLAGS) -o $@ $<

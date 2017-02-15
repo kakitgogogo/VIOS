@@ -8,6 +8,8 @@
 /* EXTERN */
 #define	EXTERN	extern
 
+#define	NULL	((void*)0)
+
 /* Boolean */
 typedef enum
 {

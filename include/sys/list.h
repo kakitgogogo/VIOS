@@ -1,23 +1,27 @@
 #ifndef	VIOS_LIST_H
 #define	VIOS_LIST_H
 
+#include "compiler.h"
 #include "kernel.h"
+#include "type.h"
+#include "stdio.h"
 
-#define LIST_POISON1	((void*)0x501000)
-#define LIST_POISON2	((void*)0x600000)
+#define LIST_POISON	((void*)0x0)
 
-typedef struct list_head
+struct list_head
 {
 	struct list_head *next;
 	struct list_head *prev;
-}list_head;
+};
+
+typedef struct list_head list_head;
 
 #define LIST_HEAD(name) \
-	struct list_head name = { &(name), &(name) };
+	struct list_head name = { &(name), &(name) }
 
-#define INIT_LIST_HEAD(ptr) \
+#define list_init(ptr) \
 	do\
-	{
+	{\
 		(ptr)->next = (ptr);\
 		(ptr)->prev = (ptr);\
 	}\
@@ -25,23 +29,23 @@ typedef struct list_head
 
 static inline void __list_add(list_head* new, list_head* prev, list_head* next)
 {
-	prev->next = new;
-	new->prev = prev;
-	new->next = next;
 	next->prev = new;
+	new->next = next;
+	new->prev = prev;
+	prev->next = new;
 }
 
-static inline list_add(list_head* new, list_head* head)
+static inline void list_add(list_head* list, list_head* new)
 {
-	__list_add(new, head, head->next);
+	__list_add(new, list, list->next);
 }
 
-static inline list_add_tail(list_head* new, list_head* head)
+static inline void list_add_tail(list_head* list, list_head* new)
 {
-	__list_add(new, head->prev, head);
+	__list_add(new, list->prev, list);
 }
 
-static inline __list_del(list_head* prev, list_head* next)
+static inline void __list_del(list_head* prev, list_head* next)
 {
 	prev->next = next;
 	next->prev = prev;
@@ -50,26 +54,26 @@ static inline __list_del(list_head* prev, list_head* next)
 static inline void list_del(list_head* entry)
 {
 	__list_del(entry->prev, entry->next);
-	entry->prev = LIST_POISON1;
-	entry->next = LIST_POISON2;
+	entry->prev = LIST_POISON;
+	entry->next = LIST_POISON;
 }
 
 static inline void list_del_init(list_head* entry)
 {
 	__list_del(entry->prev, entry->next);
-	INIT_LIST_HEAD(entry);
+	list_init(entry);
 }
 
-static inline void list_move(list_head* list, list_head* head)
+static inline void list_move(list_head* pos1, list_head* pos2)  //move pos1 to pos2
 {
-	__list_del(list->prev, list->next);
-	list_add(list, head);
+	__list_del(pos1->prev, pos1->next);
+	list_add(pos2, pos1);
 }
 
-static inline void list_move_tail(list_head* list, list_head* head)
+static inline void list_move_tail(list_head* pos1, list_head* pos2)
 {
-	__list_del(list->prev, list->next);
-	list_add_tail(list, head);
+	__list_del(pos1->prev, pos1->next);
+	list_add_tail(pos2, pos1);
 }
 
 static inline bool list_empty(const list_head* head)
@@ -108,53 +112,59 @@ static inline void list_splice_init(list_head* list, list_head* head)
 	if(!list_empty(list))
 	{
 		__list_splice(list, head);
-		INIT_LIST_HEAD(list);
+		list_init(list);
 	}
 }
 
 #define list_entry(ptr, type, member) container_of(ptr, type, member)
 
-static inline void prefetch(const void *x) {;} /*TODO*/
-
-#define list_for_each(pos, head) \
+#define list_for_each(head, pos) \
 	for(	pos = (head)->next, prefetch(pos->next); \
 		pos != (head); \
 		pos = pos->next, prefetch(pos->next))
 
-#define __list_for_each(pos, head) \
+#define __list_for_each(head, pos) \
 	for (pos = (head)->next; pos != (head); pos = pos->next)
 
-#define list_for_each_prev(pos, head) \
+#define list_for_each_prev(head, pos) \
 	for(	pos = (head)->prev, prefetch(pos->prev); \
 		pos != (head); \
 		pos = pos->prev, prefetch(pos->prev))
 
-#define __list_for_each(pos, head) \
+#define __list_for_each_prev(head, pos) \
 	for (pos = (head)->prev; pos != (head); pos = pos->prev)
 
-#define list_for_each_safe(pos, n, head) \
+#define list_for_each_safe(head, pos, n) \
 	for(	pos = (head)->next, n = pos->next; \
 		pos != (head); \
 		pos = n, n = pos->next)
 
-#define list_for_each_entry(pos, head, member) \
+#define list_for_each_entry(head, pos, member) \
 	for(	pos = list_entry((head)->next, typeof(*pos), member), prefetch(pos->member.next);	 \
 		&pos->member != (head); \
 		pos = list_entry(pos->member.next, typeof(*pos), member), prefetch(pos->member.next))
 
-#define list_for_each_entry_reverse(pos, head, member) \
+#define list_for_each_entry_reverse(head, pos, member) \
 	for(	pos = list_entry((head)->prev, typeof(*pos), member), prefetch(pos->member.prev);	 \
 		&pos->member != (head); \
 		pos = list_entry(pos->member.prev, typeof(*pos), member), prefetch(pos->member.prev))
 
-#define list_for_each_entry_continue(pos, head, member) \
+#define list_for_each_entry_continue(head, pos, member) \
 	for(	pos = list_entry(pos->member.next, typeof(*pos), member), prefetch(pos->member.next); \
 		&pos->member != (head); \
 		pos = list_entry(pos->member.next, typeof(*pos), member), prefetch(pos->member.next))
 
-#define list_for_each_safe(pos, n, head, member) \
+#define list_for_each_entry_safe(head, pos, n, member) \
 	for(	pos = list_entry((head)->next, typeof(*pos), member), \
 		n = list_entry(pos->member.next, typeof(*pos), member); \
 		&pos->member != (head); \
-		pos = n, n = list_entry(pos->member.next, typeof(*pos), member); 
+		pos = n, n = list_entry(pos->member.next, typeof(*pos), member)
 
+static inline list_head* list_find(list_head* list, list_head* head)
+{
+	list_head* pos;
+	list_for_each(list, pos) if(pos == head) return pos;
+	return LIST_POISON;
+}
+
+#endif

@@ -11,7 +11,10 @@ int main()
 	{
 		int r = read(fin, rdbuf, sizeof(dir_entry));
 		entry = (dir_entry*)rdbuf;
-		printf("%s\n", entry->name);
+		if(entry->inode_id != 0)
+		{
+			printf("%s\n", entry->name);
+		}
 	}
 	while(entry->inode_id);
 

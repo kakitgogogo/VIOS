@@ -71,6 +71,7 @@ void assertion_failure(char *exp, char *file, char *base_file, int line);
 #define	HZ				1000
 
 #define	MAX_TICKS		0x7FFFABCD
+#define	MAX_MSEC			(MAX_TICKS * (1000 / HZ))
 
 /* 8042 */
 #define	KB_DATA			0x60
@@ -124,6 +125,8 @@ void assertion_failure(char *exp, char *file, char *base_file, int line);
 #define	STR_DEFAULT_LEN	1024
 
 /* Process */
+#define 	RUNNING			0x00
+#define	BLOCKED			0x01
 #define	SENDING			0x02
 #define	RECEIVING		0x04
 #define	WAITING			0x08

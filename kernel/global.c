@@ -10,6 +10,7 @@
 #include "proc.h"
 #include "global.h"
 #include "proto.h"
+#include "bitmap.h"
 
 PUBLIC	PROCESS	proc_table[NR_TASKS + NR_PROCS];
 
@@ -23,9 +24,7 @@ PUBLIC	TASK	task_table[NR_TASKS] = {
 
 PUBLIC	TASK	user_proc_table[NR_NATIVE_PROCS] = {
 	{init, STACK_SIZE_INIT, "INIT"},
-	{testA, STACK_SIZE_TESTA, "testA"},
-	{testB, STACK_SIZE_TESTB, "testB"},
-	{testC, STACK_SIZE_TESTC, "testC"}
+	{test, STACK_SIZE_TEST, "TEST"}
 };
 
 PUBLIC	char	task_stack[STACK_SIZE_TOTAL];
@@ -56,3 +55,8 @@ PUBLIC	const int	FSBUF_SIZE	= 0x100000;		/* 1M */
 
 PUBLIC	u8*			mmbuf		= (u8*)0x700000;	/* 7M */
 PUBLIC	const int	MMBUF_SIZE	= 0x100000;		/* 1M */
+
+PUBLIC	bool		isInited	= FALSE;
+PUBLIC	bool		isPreemptDisabled = FALSE;
+
+PUBLIC	u8*			global_bitmap = (u8*)0x800000; 

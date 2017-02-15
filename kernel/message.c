@@ -8,21 +8,11 @@
 #include "proc.h"
 #include "global.h"
 #include "proto.h"
+#include "sched.h"
 
 PUBLIC void reset_msg(MESSAGE* msg)
 {
 	memset((void*)msg, 0, sizeof(MESSAGE));
-}
-
-PRIVATE void block(PROCESS *proc)
-{
-	assert(proc->pflags);
-	schedule();
-}
-
-PRIVATE void unblock(PROCESS *proc)
-{
-	assert(proc->pflags == 0);
 }
 
 PRIVATE bool deadlock(int src, int des)
@@ -232,9 +222,14 @@ PRIVATE int msg_receive(PROCESS* cur, int src, MESSAGE* msg)
 			receiver->recvfrom = ANY;
 		else
 			receiver->recvfrom = proc2pid(from);
-
+		
 		block(receiver);
 
+		if(receiver->pflags != RECEIVING)
+		{
+			dump_proc(receiver);
+			BREAK_POINT;
+		}
 		assert(receiver->pflags == RECEIVING);
 		assert(receiver->pmsg != 0);
 		assert(receiver->recvfrom != NO_TASK);
@@ -332,9 +327,9 @@ PUBLIC void dump_proc(PROCESS *proc)
 
 	sprintf(info, "ldt_selector: 0x%x.  ", proc->ldt_selector); 
 	disp_color_str(info, text_color);
-	sprintf(info, "ticks: %d.  ", proc->ticks); 
+	sprintf(info, "time_slice: %d.  ", proc->time_slice); 
 	disp_color_str(info, text_color);
-	sprintf(info, "priority: %d.  ", proc->priority); 
+	sprintf(info, "priority: %d.  ", proc->prio); 
 	disp_color_str(info, text_color);
 	sprintf(info, "pid: %d.  ", proc->pid); 
 	disp_color_str(info, text_color);
@@ -343,9 +338,9 @@ PUBLIC void dump_proc(PROCESS *proc)
 	disp_color_str("\n", text_color);
 	sprintf(info, "pflags: 0x%x.  ", proc->pflags); 
 	disp_color_str(info, text_color);
-	sprintf(info, "recvfrom: 0x%x.  ", proc->recvfrom); 
+	sprintf(info, "recvfrom: %d.  ", proc->recvfrom); 
 	disp_color_str(info, text_color);
-	sprintf(info, "sendto: 0x%x.  ", proc->sendto); 
+	sprintf(info, "sendto: %d.  ", proc->sendto); 
 	disp_color_str(info, text_color);
 	sprintf(info, "tty_id: %d.  ", proc->tty_id); 
 	disp_color_str(info, text_color);

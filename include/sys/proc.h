@@ -1,6 +1,9 @@
 #ifndef	VIOS_PROC_H
 #define	VIOS_PROC_H
 
+#include "list.h"
+#include "sched.h"
+
 typedef struct s_stackframe
 {
 	u32	gs;
@@ -71,13 +74,23 @@ typedef struct s_proc
 	u16			ldt_selector;
 	DESCRIPTOR	ldts[LDT_SIZE];
 
-	int			ticks;
-	int			priority;
-
 	u32			pid;
 	char		pname[16];
 
 	int			pflags;
+
+	int			time_slice;
+	int			prio;
+	int			static_prio;
+
+	prio_array_t* array;
+
+	u32			sleep_avg;
+	u32			timestamp;
+	int			activated;
+	int			interactive_credit;
+
+	list_head	run_list;
 
 	MESSAGE*	pmsg;
 	int			recvfrom;
@@ -108,9 +121,11 @@ typedef struct s_task
 
 #define	NR_TASKS			5
 #define	NR_PROCS			32
-#define	NR_NATIVE_PROCS	4
+#define	NR_NATIVE_PROCS	2
 #define	FIRST_PROC		proc_table[0]
 #define	LAST_PROC		proc_table[NR_TASKS + NR_PROCS - 1]
+
+#define	IS_USER_PROC(p)	((p)->pid >= NR_TASKS)
 
 #define	PROCS_BASE			0xA00000
 #define	PROC_SIZE_DEFAULT	0x100000
@@ -123,9 +138,7 @@ typedef struct s_task
 #define	STACK_SIZE_FS		STACK_SIZE_DEFAULT
 #define	STACK_SIZE_MM		STACK_SIZE_DEFAULT
 #define	STACK_SIZE_INIT		STACK_SIZE_DEFAULT
-#define	STACK_SIZE_TESTA		STACK_SIZE_DEFAULT
-#define	STACK_SIZE_TESTB		STACK_SIZE_DEFAULT
-#define	STACK_SIZE_TESTC		STACK_SIZE_DEFAULT
+#define	STACK_SIZE_TEST		STACK_SIZE_DEFAULT
 
 #define	STACK_SIZE_TOTAL		(STACK_SIZE_TTY + \
 							STACK_SIZE_SYS + \
@@ -133,8 +146,6 @@ typedef struct s_task
 							STACK_SIZE_FS + \
 							STACK_SIZE_MM + \
 							STACK_SIZE_INIT + \
-							STACK_SIZE_TESTA + \
-							STACK_SIZE_TESTB + \
-							STACK_SIZE_TESTC)
+							STACK_SIZE_TEST)
 
 #endif

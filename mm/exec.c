@@ -10,6 +10,7 @@
 #include "proto.h"
 #include "keyboard.h"
 #include "stdio.h"
+#include "sched.h"
 
 #include "elf.h"
 
