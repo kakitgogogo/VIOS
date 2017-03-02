@@ -55,7 +55,7 @@ typedef struct s_tss
 
 /* GDT Index */
 #define	INDEX_DUMMY			0
-#define	INDEX_FLAT_C			1
+#define	INDEX_FLAT_C		1
 #define	INDEX_FLAT_RW		2
 #define	INDEX_VIDEO			3
 #define	INDEX_TSS			4
@@ -64,9 +64,9 @@ typedef struct s_tss
 /* Selector */
 #define	SELECTOR_DEMMY		0
 #define	SELECTOR_FLAT_C		0x08
-#define	SELECTOR_FLAT_RW		0x10
+#define	SELECTOR_FLAT_RW	0x10
 #define	SELECTOR_VIDEO		(0x18 + 3)
-#define	SELECTOR_TSS			0x20
+#define	SELECTOR_TSS		0x20
 #define	SELECTOR_LDT_FIRST	0x28
 
 #define	SELECTOR_KERNEL_CS	SELECTOR_FLAT_C
@@ -75,8 +75,8 @@ typedef struct s_tss
 
 /* LDT Constant and Macro */
 #define	LDT_SIZE				2
-#define	SELECTOR_IN_LDT(n)	n * 8
-#define	INDEX_LDT_C			0
+#define	SELECTOR_IN_LDT(n)		n * 8
+#define	INDEX_LDT_C				0
 #define	INDEX_LDT_RW			1
 
 /* Seletor Attribute */
@@ -102,7 +102,7 @@ typedef struct s_tss
 #define	DA_DR				0x90
 #define	DA_DRW				0x92
 #define	DA_DRWA				0x93
-#define	DA_C					0x98
+#define	DA_C				0x98
 #define	DA_CR				0x9A
 #define	DA_CCO				0x9C
 #define	DA_CCOR				0x9E
@@ -116,7 +116,7 @@ typedef struct s_tss
 
 /* Interrupt Vector */
 #define	INT_VECTOR_DIVIDE			0x0
-#define	INT_VECTOR_DEBUG				0x1
+#define	INT_VECTOR_DEBUG			0x1
 #define	INT_VECTOR_NMI				0x2
 #define	INT_VECTOR_BREAKPOINT		0x3
 #define	INT_VECTOR_OVERFLOW			0x4
@@ -125,7 +125,7 @@ typedef struct s_tss
 #define	INT_VECTOR_COPROC_NOT		0x7
 #define	INT_VECTOR_DOUBLE_FAULT		0x8
 #define	INT_VECTOR_COPROC_SEG		0x9
-#define	INT_VECTOR_INVAL_TSS			0xA
+#define	INT_VECTOR_INVAL_TSS		0xA
 #define	INT_VECTOR_SEG_NOT			0xB
 #define	INT_VECTOR_STACK_FAULT		0xC
 #define	INT_VECTOR_PROTECTION		0xD

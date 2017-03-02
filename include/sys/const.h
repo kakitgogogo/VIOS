@@ -71,7 +71,7 @@ void assertion_failure(char *exp, char *file, char *base_file, int line);
 #define	HZ				1000
 
 #define	MAX_TICKS		0x7FFFABCD
-#define	MAX_MSEC			(MAX_TICKS * (1000 / HZ))
+#define	MAX_MSEC		(MAX_TICKS * (1000 / HZ))
 
 /* 8042 */
 #define	KB_DATA			0x60
@@ -125,8 +125,6 @@ void assertion_failure(char *exp, char *file, char *base_file, int line);
 #define	STR_DEFAULT_LEN	1024
 
 /* Process */
-#define 	RUNNING			0x00
-#define	BLOCKED			0x01
 #define	SENDING			0x02
 #define	RECEIVING		0x04
 #define	WAITING			0x08
@@ -136,8 +134,8 @@ void assertion_failure(char *exp, char *file, char *base_file, int line);
 /* Task */
 #define	INVALID_DRIVER	-20
 #define	INTERRUPT		-10
-#define	TASK_TTY			0
-#define	TASK_SYS			1
+#define	TASK_TTY		0
+#define	TASK_SYS		1
 #define	TASK_HD			2
 #define	TASK_FS			3
 #define	TASK_MM			4
@@ -196,7 +194,7 @@ enum msgtype
 #define	FD			u.m3.m3i1
 #define	PATHNAME	u.m3.m3p1 
 #define	FLAGS		u.m3.m3i1 
-#define	NAME_LEN		u.m3.m3i2 
+#define	NAME_LEN	u.m3.m3i2 
 #define	BUF_LEN		u.m3.m3i3
 #define	CNT			u.m3.m3i2
 #define	REQUEST		u.m3.m3i2

@@ -250,6 +250,9 @@ PUBLIC void clear_console()
 {
 	CONSOLE *console = &console_table[current_console_id];
 	console->cursor = console->original_addr;
+	console->current_start_addr = console->original_addr;
+
+	flush(console);
 
 	clear_screen(console->cursor, console->console_size);
 

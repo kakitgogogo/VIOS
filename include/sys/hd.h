@@ -16,14 +16,14 @@ typedef struct part_entry
 }part_entry;
 
 /* Command Block Registers */
-#define	REG_DATA			0x1F0
-#define	REG_FEATURES		0x1F1
+#define	REG_DATA		0x1F0
+#define	REG_FEATURES	0x1F1
 #define	REG_ERROR		REG_FEATURES
 
 #define	REG_NSECTOR		0x1F2
 #define	REG_LBA_LOW		0x1F3
 #define	REG_LBA_MID		0x1F4
-#define	REG_LBA_HIGH		0x1F5
+#define	REG_LBA_HIGH	0x1F5
 #define	REG_DEVICE		0x1F6
 
 #define	REG_STATUS		0x1F7
@@ -38,11 +38,11 @@ typedef struct part_entry
 
 #define	REG_CMD			REG_STATUS
 
-#define	REG_DEV_CTRL		0x3F6
+#define	REG_DEV_CTRL	0x3F6
 
 #define	REG_ALT_STATUS	REG_DEV_CTRL
 
-#define	REG_DRV_ADDR		0x3F7
+#define	REG_DRV_ADDR	0x3F7
 
 typedef struct hd_cmd
 {
@@ -68,10 +68,10 @@ typedef struct hd_info
 	part_info	logical[NR_SUB_PER_DRIVER];
 }hd_info;
 
-#define	HD_TIMEOUT			10000
+#define	HD_TIMEOUT			100000
 #define	PART_TABLE_OFFSET	0x1BE
-#define	ATA_IDENTIFY			0xEC
-#define	ATA_READ				0x20
+#define	ATA_IDENTIFY		0xEC
+#define	ATA_READ			0x20
 #define	ATA_WRITE			0x30
 
 #define	MAKE_DEVICE_REG(lba, drv, lba_highest) \

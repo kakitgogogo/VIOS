@@ -8,11 +8,8 @@
 #include "proc.h"
 #include "global.h"
 #include "proto.h"
-
-PUBLIC PROCESS* current()
-{
-	return proc_ready;
-}
+#include "sched.h"
+#include "list.h"
 
 PUBLIC int sys_get_ticks()
 {
@@ -60,12 +57,37 @@ PUBLIC void tty_write(TTY* tty, char* buf, int len)
 	}
 }
 
-PUBLIC void proc_info(PROCESS* proc)
+PRIVATE print_align(int maxlen, const char *fmt, va_list args)
 {
-	printk("\nPROCESS %s(%d) INFO:\n", proc->pname, proc->pid);
-	printk("\tldt_selector: 0x%x\n", proc->ldt_selector);
-	printk("\tprio: 0x%x\n", proc->prio);
-	printk("\ttime_slice: %dms\n", proc->time_slice);
-	printk("\ttimestamp: 0x%x\n", proc->timestamp);
-	printk("\tinteractive_credit: 0x%x\n", proc->interactive_credit);
+	int i, len;
+	char* buf;
+
+	vsprintf(buf, fmt, args);
+	len = strlen(buf);
+	for(i = 0; i < len && i < maxlen; ++i)
+	{
+		printk("%c", buf[i]);
+	}
+	for(i; i < maxlen; ++i)
+	{
+		printk(" ");
+	}
+}
+
+PUBLIC proc_info()
+{
+	int i;
+	PROCESS* proc;
+
+	for(i = 0, proc = proc_table; i < NR_TASKS + NR_PROCS; ++i, ++proc)
+	{
+		if(proc->pflags & FREE_SLOT == 0)
+		{
+			print_align(8, "%s", proc->pname);
+			print_align(8, "%x", proc->pflags);
+			print_align(8, "%d", proc->pid);
+			print_align(8, "%d", proc->prio);
+			print_align(8, "%d", proc->tty_id);
+		}
+	}
 }

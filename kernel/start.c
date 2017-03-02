@@ -6,8 +6,9 @@
 #include "console.h"
 #include "fs.h"
 #include "proc.h"
-#include "global.h"
+#include "sched.h"
 #include "proto.h"
+#include "global.h"
 
 PUBLIC void cstart()
 {

@@ -11,7 +11,6 @@
 #include "keyboard.h"
 #include "stdio.h"
 #include "sched.h"
-#include "list.h"
 
 PUBLIC int kernel_main()
 {
@@ -25,7 +24,16 @@ PUBLIC int kernel_main()
 	u8 priv, rpl;
 	u32 eflags, prio;
 
-	int tty_ids[NR_TASKS + NR_NATIVE_PROCS] = {0, 0, 0, 0, 0, 0};
+	int tty_ids[NR_TASKS + NR_NATIVE_PROCS] = {0, 0, 0, 0, 0, 0, 0};
+	int task_prios[NR_TASKS] = {110, 110, 110, 110, 110};
+	/* 
+	task prios:
+		1.TTY 110
+		2.SYS 110
+		3.HD  110
+		4.FS  110
+		5.MM  110
+	*/
 
 	for(i = 0; i < NR_TASKS + NR_PROCS; ++i, ++proc, ++task)
 	{
@@ -40,7 +48,7 @@ PUBLIC int kernel_main()
 			priv = PRIVILEGE_TASK;
 			rpl = RPL_TASK;
 			eflags = 0x1202;
-			prio = 120;
+			prio = task_prios[i];
 		}
 		else
 		{
@@ -237,18 +245,22 @@ void shell(const char* tty_name)
 	int fd_stdout = open(tty_name, O_RDWR);
 	assert(fd_stdout == 1);
 
-#if 0
-	int child_pid = getpid();
+#if 1
+	int child_pid = getpid(), i;
 	printk("[SHELL] Child id: %d\n", child_pid);
+	printk("[SHELL] Child->prio: %d\n", proc_table[child_pid].prio);
+	printk("[SHELL] Child->pflags: %x\n", proc_table[child_pid].pflags);
 	printk("[SHELL] stdin: inode: %x\n", (&proc_table[child_pid])->files[fd_stdin]->fd_inode);
-	printk("[SHELL] stdout: inode: %x\n", (&proc_table[child_pid])->files[fd_stdout]->fd_inode);
+	printk("[SHELL] stdout: inode: %x\n", (&proc_table[child_pid])->files[fd_stdout]->fd_inode);	
 #endif
+
 	char rdbuf[128];
 
 	while(1)
 	{
 		write(fd_stdout, "$", 2);
 		int r = read(fd_stdin, rdbuf, 70);
+		if(r == 0) continue;
 		rdbuf[r] = 0;
 
 		int argc = 0;
@@ -316,8 +328,7 @@ void init()
 	printf("[INIT] Init is running ...\n");
 	untar("/cmd.tar");
 
-	//printf("bm: len: %d\n", global_bitmap->bytes_len);
-	//test_bitmap();
+	proc_info();
 
 	char* tty_list[] = {
 		"/dev_tty2",
@@ -356,5 +367,8 @@ void init()
 
 void test()
 {
-	while(1);
+	while(1)
+	{
+		milli_delay(10000);
+	}
 }

@@ -1,7 +1,7 @@
 %include "sconst.inc"
 
-GET_TICKS_ID		equ	0
-WRITE_ID			equ	1
+GET_TICKS_ID	equ	0
+WRITE_ID		equ	1
 PRINTX_ID		equ	2
 SENDREC_ID		equ	3
 INT_VECTOR_SYS_CALL	equ	0x90

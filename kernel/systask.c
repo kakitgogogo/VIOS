@@ -68,7 +68,7 @@ PUBLIC void task_sys()
 			memcpy(va2la(src, msg.BUF), va2la(TASK_SYS, &t), sizeof(t));
 			send_recv(SEND, src, &msg);
 		default:
-			panic("SYS::Unknown msg type");
+			panic("Unknown msg type");
 			break;
 		}
 	}

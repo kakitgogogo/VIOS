@@ -214,6 +214,12 @@ PUBLIC void in_process(TTY* tty, u32 key)
 				scroll_screen(tty->console, SCR_DN);
 			}
 			break;
+		case 'c':
+			if((key & FLAG_CTRL_L) || (key & FLAG_CTRL_R))
+			{
+				
+			}
+			break;
 		case F1:
 		case F2:
 		case F3:
@@ -226,7 +232,7 @@ PUBLIC void in_process(TTY* tty, u32 key)
 		case F10:
 		case F11:
 		case F12:
-			if((key & FLAG_ALT_L) || (key & FLAG_ALT_R))
+			if((key & FLAG_SHIFT_L) || (key & FLAG_SHIFT_R))
 			{
 				select_console(raw_code - F1);
 			}

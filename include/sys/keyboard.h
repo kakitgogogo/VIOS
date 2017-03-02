@@ -2,20 +2,20 @@
 #define	VIOS_KEYBOARD_H
 
 #define	KB_IN_BYTES		32
-#define	MAP_COLS			3
+#define	MAP_COLS		3
 #define	NR_SCAN_CODES	0x80
 
 #define	FLAG_BREAK		0x0080
-#define	FLAG_EXT			0x0100
-#define	FLAG_SHIFT_L		0x0200
-#define	FLAG_SHIFT_R		0x0400
+#define	FLAG_EXT		0x0100
+#define	FLAG_SHIFT_L	0x0200
+#define	FLAG_SHIFT_R	0x0400
 #define	FLAG_CTRL_L		0x0800
 #define	FLAG_CTRL_R		0x1000
 #define	FLAG_ALT_L		0x2000
 #define	FLAG_ALT_R		0x4000
-#define	FLAG_PAD			0x8000
+#define	FLAG_PAD		0x8000
 
-#define	MASK_RAW			0x01FF
+#define	MASK_RAW		0x01FF
 
 #define	ESC				(0x01 + FLAG_EXT)
 #define	TAB				(0x02 + FLAG_EXT)
@@ -34,7 +34,7 @@
 #define	ALT_R			(0x0D + FLAG_EXT)	
 
 #define	CAPS_LOCK		(0x0E + FLAG_EXT)	
-#define	NUM_LOCK			(0x0F + FLAG_EXT)	
+#define	NUM_LOCK		(0x0F + FLAG_EXT)	
 #define	SCROLL_LOCK		(0x10 + FLAG_EXT)	
 
 #define	F1				(0x11 + FLAG_EXT)	
@@ -68,9 +68,9 @@
 #define	WAKE			(0x2B + FLAG_EXT)	
 
 #define	PAD_SLASH		(0x2C + FLAG_EXT)	
-#define	PAD_STAR			(0x2D + FLAG_EXT)	
+#define	PAD_STAR		(0x2D + FLAG_EXT)	
 #define	PAD_MINUS		(0x2E + FLAG_EXT)	
-#define	PAD_PLUS			(0x2F + FLAG_EXT)	
+#define	PAD_PLUS		(0x2F + FLAG_EXT)	
 #define	PAD_ENTER		(0x30 + FLAG_EXT)	
 #define	PAD_DOT			(0x31 + FLAG_EXT)	
 #define	PAD_0			(0x32 + FLAG_EXT)	
@@ -84,13 +84,13 @@
 #define	PAD_8			(0x3A + FLAG_EXT)	
 #define	PAD_9			(0x3B + FLAG_EXT)	
 #define	PAD_UP			PAD_8			
-#define	PAD_DOWN			PAD_2			
-#define	PAD_LEFT			PAD_4			
+#define	PAD_DOWN		PAD_2			
+#define	PAD_LEFT		PAD_4			
 #define	PAD_RIGHT		PAD_6			
-#define	PAD_HOME			PAD_7			
+#define	PAD_HOME		PAD_7			
 #define	PAD_END			PAD_1			
 #define	PAD_PAGEUP		PAD_9			
-#define	PAD_PAGEDOWN		PAD_3			
+#define	PAD_PAGEDOWN	PAD_3			
 #define	PAD_INS			PAD_0			
 #define	PAD_MID			PAD_5			
 #define	PAD_DEL			PAD_DOT			

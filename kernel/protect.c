@@ -175,14 +175,14 @@ PUBLIC void exception_handler(int vec_no, int err_code, int eip, int cs, int efl
 					"#AC Alignment Check",
 					"#MC Machine Check",
 					"#XF SIMD Floating-Point Exception"
-					};
+	};
 
-	disp_pos = 0; 
+	//disp_pos = 0; 
 	for(i = 0; i < 80 * 3; ++i)
 	{
 		disp_color_str(" ", text_color);
 	}
-	disp_pos = 0;
+	//disp_pos = 0;
 
 	disp_color_str("Exception! --> ", text_color);
 	disp_color_str(err_msg[vec_no], text_color);

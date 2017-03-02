@@ -20,7 +20,7 @@ PUBLIC void get_boot_params(boot_params* bp)
 	assert(p[BI_MAGIC] == BOOT_PARAM_MAGIC);
 
 	bp->mem_size = p[BI_MEM_SIZE];
-	bp->kernel_bin = (unsigned char*)(p[BI_KERNEL_BIN]);
+	bp->kernel_bin = (unsigned*)(p[BI_KERNEL_BIN]);
 
 	assert(memcmp(bp->kernel_bin, ELFMAG, SELFMAG) == 0);
 }

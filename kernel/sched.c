@@ -13,6 +13,7 @@
 #include "preempt.h"
 #include "atomic.h"
 #include "sched.h"
+#include "proto.h"
 
 PRIVATE inline u32 task_timeslice(PROCESS* proc)
 {
@@ -33,7 +34,7 @@ PRIVATE void enqueue(PROCESS* proc, prio_array_t* array)
 {
 	list_add_tail(array->queue + proc->prio, &proc->run_list);
 	bitmap_set(&array->bm, proc->prio, 1);
-	++array->nr_active;
+	++(array->nr_active);
 	proc->array = array;
 }
 
@@ -41,7 +42,7 @@ PRIVATE void enqueue_head(PROCESS* proc, prio_array_t* array)
 {
 	list_add(array->queue + proc->prio, &proc->run_list);
 	bitmap_set(&array->bm, proc->prio, 1);
-	++array->nr_active;
+	++(array->nr_active);
 	proc->array = array;
 }
 
@@ -76,7 +77,7 @@ PRIVATE inline void __activate_task(PROCESS* proc, runqueue_t* rq)
 /* Priority Recalculation */
 PRIVATE void update_task_prio(PROCESS* proc, u32 now)
 {
-	u32 sleep_time;
+	u64 sleep_time;
 	if(now < proc->timestamp) sleep_time = now + (MAX_MSEC -  proc->timestamp);
 	else sleep_time = now - proc->timestamp;
 	if(sleep_time > MAX_SLEEP_AVG) sleep_time = MAX_SLEEP_AVG;
@@ -114,7 +115,7 @@ PRIVATE void update_task_prio(PROCESS* proc, u32 now)
 			if (proc->sleep_avg > MAX_SLEEP_AVG)
 			{
 				proc->sleep_avg = MAX_SLEEP_AVG;
-				if (!HIGH_CREDIT(proc))
+				if(!HIGH_CREDIT(proc))
 				{
 					++proc->interactive_credit;
 				}
@@ -125,8 +126,10 @@ PRIVATE void update_task_prio(PROCESS* proc, u32 now)
 	proc->prio = effective_prio(proc);
 }
 
-PUBLIC inline void activate_task(PROCESS* proc, runqueue_t* rq)
+PUBLIC void activate_task(PROCESS* proc, runqueue_t* rq)
 {
+	if(proc->array == rq->active) return;
+	
 	u32 now = sched_clock();
 
 	update_task_prio(proc, now);
@@ -136,8 +139,10 @@ PUBLIC inline void activate_task(PROCESS* proc, runqueue_t* rq)
 	__activate_task(proc, rq);
 }
 
-PUBLIC inline deactivate_task(PROCESS* proc, runqueue_t* rq)
+PUBLIC void deactivate_task(PROCESS* proc, runqueue_t* rq)
 {
+	if(proc->array = NULL) return;
+
 	--rq->nr_running;
 
 	dequeue(proc, proc->array);
@@ -145,27 +150,21 @@ PUBLIC inline deactivate_task(PROCESS* proc, runqueue_t* rq)
 	proc->array = NULL;
 }
 
-void sched_tick()
+PUBLIC void sched_tick_new()
 {
 	PROCESS* proc = current();
 	runqueue_t *rq = this_rq();
 
-	if(proc->array != rq->active)
-	{
-		printk("warning!\tcunrrent->array != rq->active\n");
-		BREAK_POINT;
-	}
-
 	if(unlikely(IS_RT(proc)))
 	{
-		if(--proc->time_slice < 0)
+		if(--proc->time_slice <= 0)
 		{
 			proc->time_slice = task_timeslice(proc);
 			dequeue(proc, rq->active);
 			enqueue(proc, rq->active);
 		}
 	}
-	else if(--proc->time_slice < 0)
+	else if(--proc->time_slice <= 0)
 	{
 		dequeue(proc, rq->active);
 		proc->prio = effective_prio(proc);
@@ -186,7 +185,15 @@ void sched_tick()
 	}
 }
 
-PUBLIC void schedule()
+PUBLIC void sched_tick()
+{
+	if(proc_ready->time_slice)
+	{
+		--proc_ready->time_slice;
+	}
+}
+
+PUBLIC void schedule_new()
 {
 	PROCESS* prev, * next;
 	runqueue_t* rq;
@@ -227,6 +234,7 @@ PUBLIC void schedule()
 	}
 
 	idx = bitmap_find_first_one(&array->bm);
+	if(idx == -1) goto end;
 	queue = array->queue + idx;
 	next = list_entry(queue->next, PROCESS, run_list);
 	next->activated = 0;
@@ -242,21 +250,22 @@ PUBLIC void schedule()
 	}
 	prev->timestamp = now;
 
+	
 	if (likely(prev != next)) 
 	{
 		next->timestamp = now;
 		rq->nr_switches++;
 		rq->curr = next;
 
-		barrier();
 
 		proc_ready = next;
 	}
 
+end:
 	preempt_enable();
 }
 
-PUBLIC void schedule_old_version()
+PUBLIC void schedule()
 {
 	preempt_disable();
 	PROCESS *p;
@@ -291,8 +300,6 @@ PUBLIC void schedule_old_version()
 
 PUBLIC void block(PROCESS *proc)
 {
-	assert(proc->pflags);
-
 	deactivate_task(proc, this_rq());
 
 	schedule();
@@ -303,8 +310,6 @@ PUBLIC void unblock(PROCESS *proc)
 	assert(proc->pflags == 0);
 
 	activate_task(proc, this_rq());
-
-	schedule();
 }
 
 PUBLIC int task_prio(PROCESS* proc)
@@ -337,6 +342,7 @@ PUBLIC void sched_init()
 	{
 		array = runqueue.arrays + i;
 		bitmap_init(&array->bm, prio_array_1, MAX_PRIO);
+		array->nr_active = 0;
 		for (j = 0; j < MAX_PRIO; ++j) 
 		{
 			list_init(array->queue + j);

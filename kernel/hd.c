@@ -9,7 +9,6 @@
 #include "proc.h"
 #include "global.h"
 #include "proto.h"
-#include "atomic.h"
 
 #define DRV_OF_DEV(dev) (dev <= MAX_PRIM ? dev / NR_PRIM_PER_DRIVER : (dev - MINOR_HD1A) / NR_SUB_PER_DRIVER)
 
@@ -274,11 +273,11 @@ PRIVATE void hd_rdwt(MESSAGE *msg)
 		hd_infos[driver].logical[logicalIdx].base;
 
 	hd_cmd cmd;
-	cmd.features	= 0;
+	cmd.features= 0;
 	cmd.count	= (msg->CNT + SECTOR_SIZE - 1) / SECTOR_SIZE;
 	cmd.lba_low	= sect_id & 0xFF;
 	cmd.lba_mid	= (sect_id >> 8) & 0xFF;
-	cmd.lba_high	= (sect_id >> 16) & 0xFF;
+	cmd.lba_high= (sect_id >> 16) & 0xFF;
 	cmd.device	= MAKE_DEVICE_REG(1, driver, (sect_id >> 24) & 0xF);
 	cmd.command	= (msg->type == DEV_READ) ? ATA_READ : ATA_WRITE;
 	hd_cmd_out(&cmd);
@@ -342,8 +341,6 @@ PUBLIC void task_hd()
 
 	hd_init();
 
-	test_in_kernel();
-
 	while(1)
 	{
 		send_recv(RECEIVE, ANY, &msg);
@@ -380,20 +377,4 @@ PUBLIC void hd_handler(int irq)
 	hd_status = in_byte(REG_STATUS);
 
 	inform_int(TASK_HD);
-}
-
-
-/* Because some test cases can only be carried out in the kernel, so choose to test here */
-void test_in_kernel()  
-{
-	//test_bitmap();
-	//test_list();
-
-	atomic_t a;
-	atomic_set(&a, 0);
-	atomic_inc(&a);
-	atomic_add(&a, 4);
-	printk("atomic counter: %d\n", atomic_get(&a));
-
-	test_sched();
 }

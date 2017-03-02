@@ -119,7 +119,7 @@ static inline void list_splice_init(list_head* list, list_head* head)
 #define list_entry(ptr, type, member) container_of(ptr, type, member)
 
 #define list_for_each(head, pos) \
-	for(	pos = (head)->next, prefetch(pos->next); \
+	for(pos = (head)->next, prefetch(pos->next); \
 		pos != (head); \
 		pos = pos->next, prefetch(pos->next))
 
@@ -127,7 +127,7 @@ static inline void list_splice_init(list_head* list, list_head* head)
 	for (pos = (head)->next; pos != (head); pos = pos->next)
 
 #define list_for_each_prev(head, pos) \
-	for(	pos = (head)->prev, prefetch(pos->prev); \
+	for(pos = (head)->prev, prefetch(pos->prev); \
 		pos != (head); \
 		pos = pos->prev, prefetch(pos->prev))
 
@@ -135,27 +135,27 @@ static inline void list_splice_init(list_head* list, list_head* head)
 	for (pos = (head)->prev; pos != (head); pos = pos->prev)
 
 #define list_for_each_safe(head, pos, n) \
-	for(	pos = (head)->next, n = pos->next; \
+	for(pos = (head)->next, n = pos->next; \
 		pos != (head); \
 		pos = n, n = pos->next)
 
 #define list_for_each_entry(head, pos, member) \
-	for(	pos = list_entry((head)->next, typeof(*pos), member), prefetch(pos->member.next);	 \
+	for(pos = list_entry((head)->next, typeof(*pos), member), prefetch(pos->member.next);	 \
 		&pos->member != (head); \
 		pos = list_entry(pos->member.next, typeof(*pos), member), prefetch(pos->member.next))
 
 #define list_for_each_entry_reverse(head, pos, member) \
-	for(	pos = list_entry((head)->prev, typeof(*pos), member), prefetch(pos->member.prev);	 \
+	for(pos = list_entry((head)->prev, typeof(*pos), member), prefetch(pos->member.prev);	 \
 		&pos->member != (head); \
 		pos = list_entry(pos->member.prev, typeof(*pos), member), prefetch(pos->member.prev))
 
 #define list_for_each_entry_continue(head, pos, member) \
-	for(	pos = list_entry(pos->member.next, typeof(*pos), member), prefetch(pos->member.next); \
+	for(pos = list_entry(pos->member.next, typeof(*pos), member), prefetch(pos->member.next); \
 		&pos->member != (head); \
 		pos = list_entry(pos->member.next, typeof(*pos), member), prefetch(pos->member.next))
 
 #define list_for_each_entry_safe(head, pos, n, member) \
-	for(	pos = list_entry((head)->next, typeof(*pos), member), \
+	for(pos = list_entry((head)->next, typeof(*pos), member), \
 		n = list_entry(pos->member.next, typeof(*pos), member); \
 		&pos->member != (head); \
 		pos = n, n = list_entry(pos->member.next, typeof(*pos), member)

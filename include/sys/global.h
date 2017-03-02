@@ -19,7 +19,7 @@
 
 EXTERN	int			ticks;
 
-EXTERN	int 			disp_pos;
+EXTERN	int 		disp_pos;
 
 EXTERN	u8 			gdt_ptr[6];
 EXTERN	DESCRIPTOR 	gdt[GDT_SIZE];
@@ -48,10 +48,6 @@ extern	system_call	sys_call_table[];
 extern	TTY			tty_table[];
 extern	CONSOLE		console_table[];
 
-EXTERN	u8			prio_array_1[MAX_PRIO / 8 + 1];
-EXTERN	u8			prio_array_2[MAX_PRIO / 8 + 1];
-EXTERN	runqueue_t	runqueue;
-
 /* File System */
 EXTERN	file_desc	fd_table[NR_FILE_DESC];
 EXTERN	inode		inode_table[NR_INODE];
@@ -65,13 +61,14 @@ extern	DRIVER		dd_map[];
 
 /* Memory Management */
 EXTERN	MESSAGE		mm_msg;
-extern	u8 *			mmbuf;
+extern	u8 *		mmbuf;
 extern	const int	MMBUF_SIZE;
 EXTERN	int			memory_size;
 
-extern	bool		isInited;
-extern	bool		isPreemptDisabled;
+EXTERN	u8			prio_array_1[MAX_PRIO / 8 + 1];
+EXTERN	u8			prio_array_2[MAX_PRIO / 8 + 1];
+EXTERN	runqueue_t	runqueue;
 
-extern	u8*			global_bitmap;
+extern	bool 		isPreemptDisabled;
 
 #endif

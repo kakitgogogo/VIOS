@@ -15,16 +15,17 @@ PUBLIC void	port_write(u16 port, void* buf, int n);
 PUBLIC void	glitter(int row, int col);
 
 /* lib/klib.c */
-PUBLIC void get_boot_params(boot_params* bp);
-PUBLIC int get_kernel_map(unsigned int* base, unsigned int* limit);
 PUBLIC void	delay(int time);
 PUBLIC void	disp_int(int input);
-PUBLIC char*	itoa(char* str, int num);
+PUBLIC void disp_color_int(int input, int color);
+PUBLIC char* itoa(char* str, int num);
+PUBLIC void get_boot_params(boot_params* bp);
+PUBLIC int	get_kernel_map(unsigned int* base, unsigned int* limit);
 
 /* lib/string.asm */
-PUBLIC void*	memcpy(void* dst, void* src, int size);
-PUBLIC void*	memset(void* des, char ch, int size);
-PUBLIC char*	strcpy(char* dst, char* src);
+PUBLIC void* memcpy(void* dst, void* src, int size);
+PUBLIC void* memset(void* des, char ch, int size);
+PUBLIC char* strcpy(char* dst, char* src);
 PUBLIC int	strlen(char* str);
 
 /* lib/misc.c */
@@ -32,7 +33,7 @@ PUBLIC void	spin(char *func_name);
 PUBLIC void	assertion_failure(char *exp, char *file, char *base_file, int line);
 PUBLIC int	memcmp(const void* s1, const void *s2, int n);;
 PUBLIC int	strcmp(const char* s1, const char* s2);
-PUBLIC char*	strcat(char *s1, const char *s2);
+PUBLIC char* strcat(char *s1, const char *s2);
 
 /* lib/open.c */
 PUBLIC int	open(const char* pathname, int flags);
@@ -40,9 +41,14 @@ PUBLIC int	open(const char* pathname, int flags);
 /* lib/close.c */
 PUBLIC int	close(int fd);
 
+/* lib/lseek.c */
+PUBLIC int lseek(int fd, int offset, int whence);
+
 /* kernel/protect.c */
 PUBLIC void	protect_init();
 PUBLIC u32	seg2phys(u16 selector);
+PUBLIC void init_descriptor(DESCRIPTOR *desc, u32 base, u32 limit, u16 attribute);
+PUBLIC u32 get_seg_base(u16 selector);
 
 /* kernel/i8259.c */
 PUBLIC void	init_8259A();
@@ -58,6 +64,7 @@ PUBLIC void	init();
 PUBLIC void	test();
 
 /* kernel/clock.c */
+PUBLIC u32 sched_clock();
 PUBLIC void	clock_init();
 PUBLIC void	clock_handler(int irq);
 PUBLIC void	milli_delay(int milli_sec);
@@ -75,6 +82,10 @@ PUBLIC void	tty_write(TTY* tty, char* buf, int len);
 /* kernel/console.c */
 PUBLIC void	out_char(CONSOLE* console, char ch);
 PUBLIC void	scroll_screen(CONSOLE* console, int direction);
+PUBLIC void screen_init(TTY* tty);
+PUBLIC int	is_current_console(CONSOLE *console);
+PUBLIC void select_console(int console_id);
+PUBLIC void clear_console();
 
 /* kernel/printf.c */
 PUBLIC int	printf(const char *fmt, ...);
@@ -87,10 +98,11 @@ PUBLIC int	sys_get_ticks();
 PUBLIC int	sys_write(int _unused1, char* buf, int len, PROCESS* proc);
 PUBLIC int	sys_printx(int _unused1, int _unused2, char* s, PROCESS* proc);
 PUBLIC int	ldt_seg_linear(PROCESS *proc, int idx);
-PUBLIC void*	va2la(int pid, void* va);
+PUBLIC void* va2la(int pid, void* va);
 PUBLIC void	schedule();
 
 /* kernel/message.c */
+PUBLIC void reset_msg(MESSAGE* msg);
 PUBLIC int	sys_sendrec(int function, int src_des, MESSAGE* msg, PROCESS* proc);
 PUBLIC int	send_recv(int function, int src_des, MESSAGE* msg);
 PUBLIC void	inform_int(int task_id);

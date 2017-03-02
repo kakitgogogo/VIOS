@@ -68,6 +68,7 @@ typedef struct
 	} u;
 } MESSAGE;
 
+
 typedef struct s_proc
 {
 	STACK_FRAME	regs;
@@ -121,11 +122,9 @@ typedef struct s_task
 
 #define	NR_TASKS			5
 #define	NR_PROCS			32
-#define	NR_NATIVE_PROCS	2
-#define	FIRST_PROC		proc_table[0]
-#define	LAST_PROC		proc_table[NR_TASKS + NR_PROCS - 1]
-
-#define	IS_USER_PROC(p)	((p)->pid >= NR_TASKS)
+#define	NR_NATIVE_PROCS		2
+#define	FIRST_PROC			proc_table[0]
+#define	LAST_PROC			proc_table[NR_TASKS + NR_PROCS - 1]
 
 #define	PROCS_BASE			0xA00000
 #define	PROC_SIZE_DEFAULT	0x100000
@@ -138,14 +137,18 @@ typedef struct s_task
 #define	STACK_SIZE_FS		STACK_SIZE_DEFAULT
 #define	STACK_SIZE_MM		STACK_SIZE_DEFAULT
 #define	STACK_SIZE_INIT		STACK_SIZE_DEFAULT
-#define	STACK_SIZE_TEST		STACK_SIZE_DEFAULT
+#define	STACK_SIZE_TESTA	STACK_SIZE_DEFAULT
+#define	STACK_SIZE_TESTB	STACK_SIZE_DEFAULT
+#define	STACK_SIZE_TESTC	STACK_SIZE_DEFAULT
 
-#define	STACK_SIZE_TOTAL		(STACK_SIZE_TTY + \
+#define	STACK_SIZE_TOTAL	(STACK_SIZE_TTY + \
 							STACK_SIZE_SYS + \
 							STACK_SIZE_HD + \
 							STACK_SIZE_FS + \
 							STACK_SIZE_MM + \
 							STACK_SIZE_INIT + \
-							STACK_SIZE_TEST)
+							STACK_SIZE_TESTA + \
+							STACK_SIZE_TESTB + \
+							STACK_SIZE_TESTC)
 
 #endif

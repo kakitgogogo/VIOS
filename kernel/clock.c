@@ -8,7 +8,6 @@
 #include "proc.h"
 #include "global.h"
 #include "proto.h"
-#include "sched.h"
 
 PUBLIC void clock_init()
 {
@@ -21,41 +20,26 @@ PUBLIC void clock_init()
 }
 
 PUBLIC void clock_handler(int irq)
-{	
+{
 	if(++ticks >= MAX_TICKS)
 	{
 		ticks = 0;
 	}
 
-	if(key_pressed)
-	{
-		inform_int(TASK_TTY);
-	}
+	sched_tick_new();
 
-	if(isPreemptDisabled) return; 
+	if(key_pressed) inform_int(TASK_TTY);
 
-	if(k_reenter != 0)
-	{
-		return;
-	}
+	if(isPreemptDisabled) return;
 
-	sched_tick();
-/*
-	if(proc_ready->time_slice)
-	{
-		--proc_ready->time_slice;
-	}
+	if(k_reenter != 0) return;
 
-	if(proc_ready->time_slice > 0)
-	{
-		return;
-	}
-	schedule();
-*/
-	schedule();
+	if(proc_ready->time_slice > 0) return;
+
+	schedule_new();
 }
 
-PUBLIC inline u64 sched_clock()
+PUBLIC u32 sched_clock()
 {
 	return ticks * 1000 / HZ;
 }

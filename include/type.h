@@ -8,8 +8,6 @@
 /* EXTERN */
 #define	EXTERN	extern
 
-#define	NULL	((void*)0)
-
 /* Boolean */
 typedef enum
 {
@@ -17,10 +15,17 @@ typedef enum
 	TRUE
 }bool;
 
+#define	NULL ((void*)0)
+
 typedef	unsigned long long	u64;
 typedef	unsigned int			u32;
 typedef	unsigned short		u16;
 typedef	unsigned char		u8;
+
+typedef signed char 		s8;
+typedef signed short 		s16;
+typedef signed int 			s32;
+typedef signed long 		s64;
 
 typedef	char*				va_list;
 
