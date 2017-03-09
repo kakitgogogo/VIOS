@@ -26,7 +26,7 @@ PUBLIC void clock_handler(int irq)
 		ticks = 0;
 	}
 
-	sched_tick_new();
+	sched_tick();
 
 	if(key_pressed) inform_int(TASK_TTY);
 
@@ -36,7 +36,7 @@ PUBLIC void clock_handler(int irq)
 
 	if(proc_ready->time_slice > 0) return;
 
-	schedule_new();
+	schedule();
 }
 
 PUBLIC u32 sched_clock()

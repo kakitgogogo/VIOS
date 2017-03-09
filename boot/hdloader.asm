@@ -482,7 +482,7 @@ setupPaging:
 	mov		ecx, eax	
 	mov		edi, PageTblBase	
 	xor		eax, eax
-	mov		eax, PG_P  | PG_USU | PG_RWW
+	mov		eax, PG_P | PG_USU | PG_RWW
 .2:
 	stosd
 	add		eax, 4096

@@ -32,6 +32,7 @@ typedef	char*				va_list;
 typedef	void	(*int_handler)	();
 typedef	void	(*task_f)		();
 typedef	void	(*irq_handler)	(int irq);
+typedef void	(*event)		();
 
 typedef	void*	system_call;
 

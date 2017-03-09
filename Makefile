@@ -33,14 +33,16 @@ OBJS			=	kernel/kernel.o kernel/start.o kernel/i8259.o \
 					kernel/clock.o kernel/proc.o kernel/hd.o kernel/sched.o \
 					kernel/keyborad.o kernel/tty.o kernel/console.o \
 					kernel/systask.o kernel/message.o kernel/panic.o \
+					kernel/lock.o \
 					fs/main.o fs/misc.o fs/open.o fs/read_write.o \
 					fs/link.o fs/stat.o\
-					mm/main.o mm/fork_exit.o mm/exec.o
+					mm/main.o mm/fork_exit.o mm/exec.o mm/memory.o
 LIBOBJS			=	lib/misc.o lib/klib.o lib/kliba.o lib/string.o \
 					lib/open.o lib/close.o lib/read.o lib/write.o\
 					lib/getpid.o lib/unlink.o lib/fork.o lib/exit.o\
 					lib/wait.o lib/printf.o lib/vsprintf.o lib/syscall.o \
-					lib/exec.o lib/stat.o lib/lseek.o lib/clear.o lib/bitmap.o
+					lib/exec.o lib/stat.o lib/lseek.o lib/clear.o lib/bitmap.o \
+					lib/rbtree.o
 DASMOUTPUT		=	kernel.bin.asm
 
 # Floppy
@@ -146,6 +148,9 @@ kernel/hd.o: kernel/hd.c
 kernel/sched.o: kernel/sched.c
 	$(CC) $(CFLAGS) -o $@ $<
 
+kernel/lock.o: kernel/lock.c
+	$(CC) $(CFLAGS) -o $@ $<
+
 
 lib/klib.o: lib/klib.c
 	$(CC) $(CFLAGS) -o $@ $<
@@ -210,6 +215,9 @@ lib/clear.o: lib/clear.c
 lib/bitmap.o: lib/bitmap.c
 	$(CC) $(CFLAGS) -o $@ $<
 
+lib/rbtree.o: lib/rbtree.c
+	$(CC) $(CFLAGS) -o $@ $<
+
 
 fs/main.o: fs/main.c
 	$(CC) $(CFLAGS) -o $@ $<
@@ -237,4 +245,7 @@ mm/fork_exit.o: mm/fork_exit.c
 	$(CC) $(CFLAGS) -o $@ $<
 
 mm/exec.o: mm/exec.c
+	$(CC) $(CFLAGS) -o $@ $<
+
+mm/memory.o: mm/memory.c
 	$(CC) $(CFLAGS) -o $@ $<

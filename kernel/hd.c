@@ -9,6 +9,8 @@
 #include "proc.h"
 #include "global.h"
 #include "proto.h"
+#include "rbtree.h"
+#include "memory.h"
 
 #define DRV_OF_DEV(dev) (dev <= MAX_PRIM ? dev / NR_PRIM_PER_DRIVER : (dev - MINOR_HD1A) / NR_SUB_PER_DRIVER)
 
@@ -378,3 +380,4 @@ PUBLIC void hd_handler(int irq)
 
 	inform_int(TASK_HD);
 }
+

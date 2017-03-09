@@ -10,6 +10,7 @@
 #include "proto.h"
 #include "keyboard.h"
 #include "stdio.h"
+#include "memory.h"
 
 PRIVATE void mm_init()
 {
@@ -19,6 +20,36 @@ PRIVATE void mm_init()
 	memory_size = bp.mem_size;
 
 	printk("[MM] mem_size: %dMB\n", memory_size >> 20);
+
+	buddy_init();
+
+	test_mm();
+}
+
+void test_mm()
+{
+	int i;
+	int* a = (int*)malloc(sizeof(int)*4);
+	for(i = 0; i < 4; ++i)
+	{
+		a[i] = i;
+	}
+	for(i = 0; i < 4; ++i)
+	{
+		printk("%d ", a[i]);
+	}
+	printk("\n");
+	printk("addr: 0x%x\n", a);
+	printk("order: %d\n", *((u8*)a - 1));
+	free(a);
+	a = (int*)malloc(sizeof(int)*4);
+	for(i = 0; i < 4; ++i)
+	{
+		printk("%d ", a[i]);
+	}
+	printk("\n");
+	printk("addr: 0x%x\n", a);
+	printk("order: %d\n", *((u8*)a - 1));
 }
 
 PUBLIC int alloc_mem(int pid, int mem_size)

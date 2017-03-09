@@ -76,7 +76,7 @@ void assertion_failure(char *exp, char *file, char *base_file, int line);
 /* 8042 */
 #define	KB_DATA			0x60
 #define	KB_CMD			0x64
-#define	LED_CODE			0xED
+#define	LED_CODE		0xED
 #define	KB_ACK			0xFA
 
 /* Hardware Interrupt Request */
@@ -239,7 +239,7 @@ enum msgtype
 #define	MINOR_HD3A			0x30
 #define	MINOR_HD4A			0x40
 
-#define	ROOT_DEV				MAKE_DEV(DEV_HD, MINOR_BOOT)
+#define	ROOT_DEV			MAKE_DEV(DEV_HD, MINOR_BOOT)
 
 #define	INVALID_INODE		0
 #define	ROOT_INODE			1
@@ -260,11 +260,11 @@ enum msgtype
 
 #define	VIOS_PART			0x99
 #define	NO_PART				0x00
-#define	EXT_PART				0x05
+#define	EXT_PART			0x05
 
-#define	NR_FILES				64
-#define	NR_FILE_DESC			64
-#define	NR_INODE				64
+#define	NR_FILES			64
+#define	NR_FILE_DESC		64
+#define	NR_INODE			64
 #define	NR_SUPER_BLOCK		8
 
 /* INODE */

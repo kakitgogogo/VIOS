@@ -28,7 +28,7 @@
 	(MIN_TIMESLICE + ((MAX_TIMESLICE - MIN_TIMESLICE) * (MAX_PRIO - 1 - NICE_TO_PRIO(0)) / (MAX_USER_PRIO - 1)))	// about 100ms, default process's time slice
 
 #define	CURRENT_BONUS(p)	(p->sleep_avg * MAX_BONUS / MAX_SLEEP_AVG)
-#define	BASE_TIMESLICE(p)	((MAX_TIMESLICE - MIN_TIMESLICE) * (MAX_PRIO - 1 - (p)->static_prio) / (MAX_USER_PRIO - 1))
+#define	BASE_TIMESLICE(p)	(MIN_TIMESLICE + (MAX_TIMESLICE - MIN_TIMESLICE) * (MAX_PRIO - 1 - (p)->static_prio) / (MAX_USER_PRIO - 1))
 
 /* About Interactive Proccess */
 #define	INTERACTIVE_DELTA			2

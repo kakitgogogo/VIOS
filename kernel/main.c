@@ -328,8 +328,6 @@ void init()
 	printf("[INIT] Init is running ...\n");
 	untar("/cmd.tar");
 
-	proc_info();
-
 	char* tty_list[] = {
 		"/dev_tty2",
 		"/dev_tty3"

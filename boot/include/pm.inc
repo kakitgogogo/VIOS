@@ -29,7 +29,7 @@ SA_RPL3		equ	3
 SA_TIG		equ	0	
 SA_TIL		equ	4	
 
-PG_P			equ	1	
+PG_P		equ	1	
 PG_RWR		equ	0	
 PG_RWW		equ	2	
 PG_USS		equ	0	

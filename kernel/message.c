@@ -119,6 +119,20 @@ PRIVATE int msg_receive(PROCESS* cur, int src, MESSAGE* msg)
 
 	assert(proc2pid(receiver) != src);
 
+	if((!receiver->has_int_msg) && (src == INTERRUPT))
+	{
+		receiver->pflags |= RECEIVING;
+		receiver->pmsg = msg;
+
+		if(src == ANY)
+			receiver->recvfrom = ANY;
+		else
+			receiver->recvfrom = proc2pid(from);
+		
+		block(receiver);
+
+		return 0;
+	}
 	if((receiver->has_int_msg) && ((src == ANY) || (src == INTERRUPT)))
 	{
 		MESSAGE tmp;
@@ -129,8 +143,6 @@ PRIVATE int msg_receive(PROCESS* cur, int src, MESSAGE* msg)
 		memcpy(va2la(proc2pid(receiver), msg), &tmp, sizeof(MESSAGE));
 
 		receiver->has_int_msg = FALSE;
-
-		block(receiver);
 
 		assert(receiver->pflags == 0);
 		assert(receiver->pmsg == 0);

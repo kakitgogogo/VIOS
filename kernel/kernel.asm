@@ -337,7 +337,7 @@ restart_reenter:
 	pop		ds
 	popad
 
-	add		esp, 4
+	add		esp, 4   ;skip RETADR
 
 	iretd
 ;-------------------------------------------------------------------------------------

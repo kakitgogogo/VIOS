@@ -126,7 +126,7 @@ typedef struct s_task
 #define	FIRST_PROC			proc_table[0]
 #define	LAST_PROC			proc_table[NR_TASKS + NR_PROCS - 1]
 
-#define	PROCS_BASE			0xA00000
+#define	PROCS_BASE			0x8A00000
 #define	PROC_SIZE_DEFAULT	0x100000
 #define	PROC_ORIGIN_STACK	0x400
 
